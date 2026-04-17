@@ -1,0 +1,93 @@
+# Implementation Plan
+
+- [ ] 1. Write bug condition exploration test
+  - **Property 1: Bug Condition** - Upload and Delete Failures
+  - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bugs exist
+  - **DO NOT attempt to fix the test or the code when it fails**
+  - **NOTE**: This test encodes the expected behavior - it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate both bugs exist
+  - **Scoped PBT Approach**: Test concrete failing cases - upload any PDF (missing boundary) and delete files with spaces/special chars (double encoding)
+  - Test that uploadManual sends multipart/form-data WITH browser-generated boundary parameter
+  - Test that deleteManual constructs URL without pre-encoding filename
+  - Test upload with simple filename (e.g., `test.pdf`) - should fail with 400 or parsing error
+  - Test upload with spaces in filename (e.g., `Test Manual.pdf`) - should fail with 400 or parsing error
+  - Test delete with spaces in filename (e.g., `Tesla Model3.pdf`) - should fail with 404
+  - Test delete with special characters (e.g., `Owner's Manual.pdf`) - should fail with 404
+  - Run test on UNFIXED code
+  - **EXPECTED OUTCOME**: Test FAILS (this is correct - it proves the bugs exist)
+  - Document counterexamples found:
+    - Upload requests missing boundary parameter in Content-Type header
+    - Delete requests with double-encoded filenames (e.g., `Tesla%20Model3.pdf` instead of `Tesla Model3.pdf`)
+  - Mark task complete when test is written, run, and failures are documented
+  - _Requirements: 1.1, 1.2, 1.3_
+
+- [ ] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - Non-Upload/Delete API Requests
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED code for non-upload/delete requests:
+    - POST to `/api/auth/login` sends JSON and receives JWT token
+    - POST to `/api/auth/register` sends JSON
+    - POST to `/api/chat` sends JSON message and receives JSON answer
+    - POST to `/api/chat/transcribe` sends multipart audio (already working)
+    - GET to `/api/manuals` receives JSON array
+    - GET/POST to `/api/history` uses JSON
+  - Write property-based tests capturing observed behavior patterns:
+    - For all non-upload/delete API requests, Content-Type is application/json
+    - For all authenticated requests, Authorization header contains Bearer token
+    - For all JSON endpoints, request and response bodies are valid JSON
+  - Property-based testing generates many test cases for stronger guarantees
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests PASS (this confirms baseline behavior to preserve)
+  - Mark task complete when tests are written, run, and passing on unfixed code
+  - _Requirements: 3.1, 3.2, 3.3, 3.4_
+
+- [ ] 3. Fix manual upload and delete bugs
+
+  - [ ] 3.1 Fix uploadManual function in frontend/src/services/manualService.js
+    - Remove explicit `headers: { 'Content-Type': 'multipart/form-data' }` line from api.post() call
+    - Allow browser to automatically set Content-Type with boundary parameter for FormData payloads
+    - Preserve onUploadProgress callback for progress tracking
+    - _Bug_Condition: isBugCondition(input) where input.operation == 'upload' AND input.file.type == 'application/pdf'_
+    - _Expected_Behavior: Upload request includes Content-Type: multipart/form-data; boundary=<generated-boundary> and backend successfully parses form data_
+    - _Preservation: All non-upload API requests continue to use Content-Type: application/json_
+    - _Requirements: 1.1, 2.1, 2.3, 3.1, 3.2, 3.3, 3.4_
+
+  - [ ] 3.2 Fix deleteManual function in frontend/src/services/manualService.js
+    - Remove encodeURIComponent() call from URL construction
+    - Change from `/api/manuals/${encodeURIComponent(filename)}` to `/api/manuals/${filename}`
+    - Allow axios to handle URL encoding at HTTP transport level
+    - Flask's <path:filename> route converter will automatically URL-decode the path segment
+    - _Bug_Condition: isBugCondition(input) where input.operation == 'delete' AND input.filename != null_
+    - _Expected_Behavior: Delete request URL contains filename without pre-encoding, backend receives correctly decoded filename and successfully deletes file_
+    - _Preservation: All non-delete API requests continue to work unchanged_
+    - _Requirements: 1.2, 1.3, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4_
+
+  - [ ] 3.3 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - Upload and Delete Success
+    - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
+    - The test from task 1 encodes the expected behavior
+    - When this test passes, it confirms the expected behavior is satisfied
+    - Run bug condition exploration test from step 1
+    - Verify upload requests now include boundary parameter in Content-Type header
+    - Verify delete requests now send non-encoded filenames in URL
+    - Verify uploads succeed with 201 status and file saved to data/manuals/
+    - Verify deletes succeed with 200 status and file removed from disk
+    - **EXPECTED OUTCOME**: Test PASSES (confirms bugs are fixed)
+    - _Requirements: 2.1, 2.2, 2.3_
+
+  - [ ] 3.4 Verify preservation tests still pass
+    - **Property 2: Preservation** - Non-Upload/Delete API Requests
+    - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
+    - Run preservation property tests from step 2
+    - Verify all non-upload/delete API requests continue to use Content-Type: application/json
+    - Verify all authenticated requests continue to include Authorization header
+    - Verify all JSON endpoints continue to work correctly
+    - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
+    - Confirm all tests still pass after fix (no regressions)
+
+- [ ] 4. Checkpoint - Ensure all tests pass
+  - Run all tests (bug condition + preservation)
+  - Verify upload works with simple filenames, spaces, and special characters
+  - Verify delete works with simple filenames, spaces, and special characters
+  - Verify all other API endpoints (login, register, chat, transcribe, list manuals, history) continue to work
+  - Ensure all tests pass, ask the user if questions arise

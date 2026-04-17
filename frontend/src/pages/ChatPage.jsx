@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Sidebar from '../components/layout/Sidebar'
 import Header from '../components/layout/Header'
 import MessageBubble, { TypingIndicator } from '../components/chat/MessageBubble'
 import ChatInput from '../components/chat/ChatInput'
 import { sendMessage } from '../services/chatService'
-import { saveConversation } from '../services/historyService'
+import { saveConversation, getConversation } from '../services/historyService'
 import api from '../services/api'
 import { Bot } from 'lucide-react'
 
@@ -45,8 +46,10 @@ function EmptyState() {
 
 export default function ChatPage() {
   const { user } = useAuth()
+  const { id } = useParams()
   const [messages, setMessages] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [historyLoading, setHistoryLoading] = useState(false)
   const [chatError, setChatError] = useState('')
   const [transcriptionAvailable, setTranscriptionAvailable] = useState(true)
   const messagesEndRef = useRef(null)
@@ -57,6 +60,24 @@ export default function ChatPage() {
       setTranscriptionAvailable(res.data?.transcription_available ?? true)
     }).catch(() => {})
   }, [])
+
+  // Load existing conversation when id param is present
+  useEffect(() => {
+    if (!id) {
+      setMessages([])
+      return
+    }
+    setHistoryLoading(true)
+    setChatError('')
+    getConversation(id)
+      .then((conv) => {
+        setMessages(conv.messages || [])
+      })
+      .catch(() => {
+        setChatError('Could not load conversation. It may have been deleted.')
+      })
+      .finally(() => setHistoryLoading(false))
+  }, [id])
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -106,7 +127,11 @@ export default function ChatPage() {
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Messages area */}
           <div className="flex-1 overflow-y-auto px-4 lg:px-8 py-6">
-            {messages.length === 0 ? (
+            {historyLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-slate-400 text-sm">Loading conversation…</div>
+              </div>
+            ) : messages.length === 0 ? (
               <EmptyState />
             ) : (
               <div className="max-w-3xl mx-auto space-y-4">

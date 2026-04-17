@@ -25,6 +25,7 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/chat" element={<ChatPage />} />
+              <Route path="/chat/:id" element={<ChatPage />} />
               <Route path="/history" element={<HistoryPage />} />
               <Route path="/upload" element={<UploadPage />} />
             </Route>

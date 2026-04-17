@@ -114,7 +114,7 @@ export default function HistoryPage() {
               {filtered.map((conv) => (
                 <button
                   key={conv.id}
-                  onClick={() => navigate('/chat')}
+                  onClick={() => navigate(`/chat/${conv.id}`)}
                   className="w-full flex items-center gap-4 px-4 py-4 rounded-xl border border-blue-900/30 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all duration-200 text-left group"
                   style={{ backgroundColor: 'rgba(13, 25, 48, 0.5)' }}
                 >
