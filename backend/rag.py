@@ -9,7 +9,6 @@ from typing import Dict, List, Optional
 import faiss
 import fitz
 import numpy as np
-from sentence_transformers import SentenceTransformer
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -33,7 +32,7 @@ class RetrievedChunk:
         return f"{self.manual} p.{self.page}"
 
 
-_model: Optional[SentenceTransformer] = None
+_model: Optional[LocalHashingEmbedder] = None
 
 
 class LocalHashingEmbedder:
@@ -74,10 +73,7 @@ class LocalHashingEmbedder:
 def get_embedding_model():
     global _model
     if _model is None:
-        try:
-            _model = SentenceTransformer("all-MiniLM-L6-v2", local_files_only=True)
-        except Exception:
-            _model = LocalHashingEmbedder()
+        _model = LocalHashingEmbedder()
     return _model
 
 
