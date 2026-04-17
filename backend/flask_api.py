@@ -317,6 +317,30 @@ def get_history():
     return jsonify(result)
 
 
+@app.route("/api/history/<int:conversation_id>", methods=["GET"])
+@require_auth
+def get_conversation(conversation_id: int):
+    user_id = request.current_user["sub"]
+    conn = get_db()
+    row = conn.execute(
+        "SELECT id, title, messages, created_at FROM chat_history WHERE id=? AND user_id=?",
+        (conversation_id, user_id),
+    ).fetchone()
+    conn.close()
+    if row is None:
+        return jsonify({"error": "Conversation not found"}), 404
+    try:
+        messages = json.loads(row["messages"])
+    except Exception:
+        messages = []
+    return jsonify({
+        "id": row["id"],
+        "title": row["title"],
+        "messages": messages,
+        "created_at": row["created_at"],
+    })
+
+
 @app.route("/api/history", methods=["POST"])
 @require_auth
 def save_history():
