@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ev-diagnostic-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn flask_api:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.0

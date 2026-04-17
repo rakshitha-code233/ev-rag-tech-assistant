@@ -1,0 +1,40 @@
+venv/
+__pycache__/
+*.pyc
+
+# Kiro IDE — never commit this
+Kiro/
+.env
+vectorstore/
+# Ignore database files
+*.sqlite3
+*.db
+
+# Ignore vector DB
+backend/database/
+
+# Ignore embeddings
+*.index
+
+# Ignore env
+venv/
+.env
+.env.local
+.env.production.local
+
+# Database files
+*.sqlite3
+*.db
+
+# Chroma DB
+chroma/
+database/
+backend/rag_store/
+
+# Frontend build
+frontend/dist/
+frontend/node_modules/
+
+# PDF uploads (too large for git)
+data/manuals/*.pdf
+backend/temp.pdf
