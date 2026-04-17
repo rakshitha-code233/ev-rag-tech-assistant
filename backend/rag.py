@@ -32,9 +32,6 @@ class RetrievedChunk:
         return f"{self.manual} p.{self.page}"
 
 
-_model: Optional[LocalHashingEmbedder] = None
-
-
 class LocalHashingEmbedder:
     def __init__(self, dimension: int = 384):
         self.dimension = dimension
@@ -68,6 +65,9 @@ class LocalHashingEmbedder:
         if convert_to_numpy:
             return vectors
         return vectors.tolist()
+
+
+_model: Optional[LocalHashingEmbedder] = None
 
 
 def get_embedding_model():
