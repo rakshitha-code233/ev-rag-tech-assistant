@@ -202,8 +202,11 @@ def transcribe():
     if not groq_key:
         return jsonify({"error": "Transcription service unavailable"}), 503
 
+    app.logger.info("transcribe: content_type=%r files=%r form=%r", 
+                    request.content_type, list(request.files.keys()), list(request.form.keys()))
+
     if "audio" not in request.files:
-        return jsonify({"error": "audio file is required"}), 400
+        return jsonify({"error": f"audio file is required. Got files: {list(request.files.keys())}, content_type: {request.content_type}"}), 400
 
     audio_file = request.files["audio"]
     suffix = Path(audio_file.filename or "recording.webm").suffix or ".webm"
