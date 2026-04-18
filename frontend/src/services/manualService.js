@@ -20,6 +20,7 @@ export async function uploadManual(file, onProgress) {
   formData.append('file', file)
 
   const response = await api.post('/api/manuals/upload', formData, {
+    headers: { 'Content-Type': undefined },
     onUploadProgress: (progressEvent) => {
       if (onProgress && progressEvent.total) {
         const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
