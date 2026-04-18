@@ -355,6 +355,26 @@ def get_conversation(conversation_id: int):
     })
 
 
+@app.route("/api/history/<int:conversation_id>", methods=["PUT"])
+@require_auth
+def update_conversation(conversation_id: int):
+    user_id = request.current_user["sub"]
+    data = request.get_json(silent=True) or {}
+    messages = data.get("messages") or []
+
+    conn = get_db()
+    result = conn.execute(
+        "UPDATE chat_history SET messages=? WHERE id=? AND user_id=?",
+        (json.dumps(messages), conversation_id, user_id),
+    )
+    conn.commit()
+    conn.close()
+
+    if result.rowcount == 0:
+        return jsonify({"error": "Conversation not found"}), 404
+    return jsonify({"id": conversation_id})
+
+
 @app.route("/api/history", methods=["POST"])
 @require_auth
 def save_history():

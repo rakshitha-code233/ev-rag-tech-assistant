@@ -6,7 +6,7 @@ import Header from '../components/layout/Header'
 import MessageBubble, { TypingIndicator } from '../components/chat/MessageBubble'
 import ChatInput from '../components/chat/ChatInput'
 import { sendMessage } from '../services/chatService'
-import { saveConversation, getConversation } from '../services/historyService'
+import { saveConversation, getConversation, updateConversation } from '../services/historyService'
 import api from '../services/api'
 import { Bot } from 'lucide-react'
 
@@ -52,6 +52,7 @@ export default function ChatPage() {
   const [historyLoading, setHistoryLoading] = useState(false)
   const [chatError, setChatError] = useState('')
   const [transcriptionAvailable, setTranscriptionAvailable] = useState(true)
+  const [conversationId, setConversationId] = useState(id ? parseInt(id) : null)
   const messagesEndRef = useRef(null)
 
   // Check health endpoint for transcription availability
@@ -65,6 +66,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!id) {
       setMessages([])
+      setConversationId(null)
       return
     }
     setHistoryLoading(true)
@@ -72,6 +74,7 @@ export default function ChatPage() {
     getConversation(id)
       .then((conv) => {
         setMessages(conv.messages || [])
+        setConversationId(conv.id)
       })
       .catch(() => {
         setChatError('Could not load conversation. It may have been deleted.')
@@ -107,9 +110,15 @@ export default function ChatPage() {
 
       setMessages((prev) => {
         const updated = [...prev, assistantMessage]
-        // Save to history (best-effort)
+        // Save or update history (best-effort)
         const title = text.slice(0, 80)
-        saveConversation(title, updated).catch(() => {})
+        if (conversationId) {
+          updateConversation(conversationId, updated).catch(() => {})
+        } else {
+          saveConversation(title, updated)
+            .then((res) => setConversationId(res.id))
+            .catch(() => {})
+        }
         return updated
       })
     } catch (err) {
