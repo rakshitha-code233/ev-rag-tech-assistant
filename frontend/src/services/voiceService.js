@@ -10,8 +10,6 @@ import api from './api'
 export async function transcribeAudio(audioBlob) {
   const formData = new FormData()
   formData.append('audio', audioBlob, 'recording.webm')
-  const response = await api.post('/api/chat/transcribe', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const response = await api.post('/api/chat/transcribe', formData)
   return response.data.transcript
 }
