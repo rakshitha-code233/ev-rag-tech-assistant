@@ -1,31 +1,54 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <!-- Black background -->
-  <rect width="512" height="512" fill="#000000"/>
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00e5ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a56db;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Dark navy background -->
+  <rect width="512" height="512" fill="#0a1628"/>
 
   <!-- Outer circle -->
-  <circle cx="256" cy="256" r="230" stroke="#1a3a5c" stroke-width="12" fill="none"/>
+  <circle cx="256" cy="256" r="220" stroke="url(#grad1)" stroke-width="5" fill="none" opacity="0.6"/>
 
-  <!-- EV Charging station body -->
-  <rect x="130" y="140" width="110" height="200" rx="10" stroke="#1a3a5c" stroke-width="10" fill="none"/>
-  <!-- Station screen -->
-  <rect x="148" y="158" width="74" height="55" rx="4" stroke="#1a3a5c" stroke-width="8" fill="none"/>
-  <!-- EV text -->
-  <text x="155" y="310" font-family="Arial Black, Arial" font-weight="900" font-size="58" fill="#f97316">EV</text>
+  <!-- Inner circle -->
+  <circle cx="256" cy="256" r="185" stroke="url(#grad1)" stroke-width="3" fill="none" opacity="0.4"/>
 
-  <!-- Car outline (right side) -->
-  <!-- Car roof/body -->
-  <path d="M270 220 Q290 185 330 178 L420 178 Q455 178 465 200 L475 230" stroke="#1a3a5c" stroke-width="10" fill="none" stroke-linecap="round"/>
-  <!-- Car body bottom -->
-  <path d="M265 230 L265 290 Q265 305 280 305 L460 305 Q475 305 475 290 L475 230 Z" stroke="#1a3a5c" stroke-width="10" fill="none"/>
-  <!-- Charging cable from station to car -->
-  <path d="M240 260 Q255 260 265 260" stroke="#1a3a5c" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Circuit dots on outer circle -->
+  <circle cx="256" cy="36" r="8" fill="none" stroke="#00e5ff" stroke-width="3"/>
+  <circle cx="476" cy="256" r="8" fill="none" stroke="#1a56db" stroke-width="3"/>
+  <circle cx="256" cy="476" r="8" fill="none" stroke="#1a56db" stroke-width="3"/>
+  <circle cx="36" cy="256" r="8" fill="none" stroke="#00e5ff" stroke-width="3"/>
+
+  <!-- Top arc (cyan, partial) -->
+  <path d="M 100 130 A 185 185 0 0 1 412 130" stroke="#00e5ff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Car body outline -->
+  <path d="M 130 270 Q 135 240 160 225 L 200 210 Q 230 185 256 182 Q 282 185 312 210 L 352 225 Q 377 240 382 270 L 382 300 Q 382 310 372 310 L 140 310 Q 130 310 130 300 Z"
+        stroke="url(#grad1)" stroke-width="5" fill="none" stroke-linejoin="round"/>
+
+  <!-- Car roof -->
+  <path d="M 175 225 Q 200 195 256 188 Q 312 195 337 225"
+        stroke="url(#grad1)" stroke-width="5" fill="none"/>
+
   <!-- Front wheel -->
-  <circle cx="310" cy="318" r="32" stroke="#1a3a5c" stroke-width="10" fill="none"/>
-  <circle cx="310" cy="318" r="10" stroke="#1a3a5c" stroke-width="6" fill="none"/>
+  <circle cx="175" cy="315" r="28" stroke="url(#grad1)" stroke-width="5" fill="none"/>
+  <circle cx="175" cy="315" r="10" stroke="url(#grad1)" stroke-width="3" fill="none"/>
+
   <!-- Rear wheel -->
-  <circle cx="435" cy="318" r="32" stroke="#1a3a5c" stroke-width="10" fill="none"/>
-  <circle cx="435" cy="318" r="10" stroke="#1a3a5c" stroke-width="6" fill="none"/>
-  <!-- Car underbody -->
-  <path d="M278 305 L278 318" stroke="#1a3a5c" stroke-width="8" fill="none"/>
-  <path d="M467 305 L467 318" stroke="#1a3a5c" stroke-width="8" fill="none"/>
+  <circle cx="337" cy="315" r="28" stroke="url(#grad1)" stroke-width="5" fill="none"/>
+  <circle cx="337" cy="315" r="10" stroke="url(#grad1)" stroke-width="3" fill="none"/>
+
+  <!-- Lightning bolt (center of car) -->
+  <path d="M 268 195 L 240 258 L 260 258 L 244 318 L 278 248 L 256 248 Z"
+        stroke="url(#grad1)" stroke-width="3" fill="url(#grad1)" opacity="0.9"/>
+
+  <!-- Wrench (below car) -->
+  <!-- Wrench handle -->
+  <rect x="175" y="348" width="162" height="14" rx="7" stroke="url(#grad1)" stroke-width="4" fill="none"/>
+  <!-- Left wrench head -->
+  <path d="M 175 342 Q 155 342 150 355 Q 155 368 175 368" stroke="url(#grad1)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Right wrench head -->
+  <path d="M 337 342 Q 357 342 362 355 Q 357 368 337 368" stroke="url(#grad1)" stroke-width="4" fill="none" stroke-linecap="round"/>
 </svg>
