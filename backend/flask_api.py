@@ -417,13 +417,16 @@ def health():
 init_db()
 init_chat_history_table()
 
-# Build RAG index on startup if manuals exist but index is missing
+# Always rebuild RAG index on startup to ensure compatibility with current faiss/numpy versions
 try:
-    from rag import INDEX_FILE, METADATA_FILE, list_manual_files, build_manual_index
-    if list_manual_files() and (not INDEX_FILE.exists() or not METADATA_FILE.exists()):
-        app.logger.info("RAG index missing — rebuilding from %d manuals", len(list_manual_files()))
-        build_manual_index()
-        app.logger.info("RAG index rebuilt successfully")
+    from rag import list_manual_files, build_manual_index
+    manuals = list_manual_files()
+    if manuals:
+        app.logger.info("Rebuilding RAG index from %d manuals on startup", len(manuals))
+        result = build_manual_index()
+        app.logger.info("RAG index built: %s", result)
+    else:
+        app.logger.warning("No manuals found in DATA_DIR on startup")
 except Exception as e:
     app.logger.warning("RAG index build failed on startup: %s", e)
 
