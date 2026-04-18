@@ -1,14 +1,62 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Share2, Settings, Zap, ChevronDown, LogOut, User } from 'lucide-react'
+import { Share2, Settings, Zap, ChevronDown, LogOut, User, X, Moon, Sun } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
-import ThemeToggle from '../ui/ThemeToggle'
+import { useTheme } from '../../contexts/ThemeContext'
 import Avatar from '../ui/Avatar'
+
+function SettingsModal({ onClose }) {
+  const { theme, toggleTheme } = useTheme()
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onClose}>
+      <div
+        className="w-80 rounded-2xl border border-blue-900/30 shadow-xl p-6"
+        style={{ backgroundColor: '#0d1117' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-white font-semibold text-base">Settings</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+            <X size={18} />
+          </button>
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between py-3 border-b border-blue-900/20">
+            <div>
+              <p className="text-white text-sm font-medium">Dark Mode</p>
+              <p className="text-slate-500 text-xs mt-0.5">Toggle light / dark theme</p>
+            </div>
+            <button
+              onClick={toggleTheme}
+              className={`relative w-12 h-6 rounded-full transition-colors ${
+                theme === 'dark' ? 'bg-blue-600' : 'bg-slate-600'
+              }`}
+              aria-label="Toggle theme"
+            >
+              <span
+                className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                  theme === 'dark' ? 'translate-x-7' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+          <div className="flex items-center justify-between py-3">
+            <div>
+              <p className="text-white text-sm font-medium">App Version</p>
+              <p className="text-slate-500 text-xs mt-0.5">EV Diagnostic Assistant v1.0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function Header({ showLoginButton = false }) {
   const { user, isAuthenticated, logout } = useAuth()
   const navigate = useNavigate()
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const dropdownRef = useRef(null)
 
   // Close dropdown on outside click
@@ -28,82 +76,106 @@ export default function Header({ showLoginButton = false }) {
     setDropdownOpen(false)
   }
 
+  const handleShare = async () => {
+    const shareData = {
+      title: 'EV Diagnostic Assistant',
+      text: 'AI-powered EV diagnostics grounded in repair manuals',
+      url: window.location.href,
+    }
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData)
+      } catch {
+        // User cancelled share
+      }
+    } else {
+      // Fallback: copy URL to clipboard
+      await navigator.clipboard.writeText(window.location.href)
+      alert('Link copied to clipboard!')
+    }
+  }
+
   return (
-    <header
-      className="flex items-center justify-between px-6 py-3 border-b border-blue-900/30 flex-shrink-0"
-      style={{ backgroundColor: '#0a0e1a' }}
-    >
-      {/* Logo + Name */}
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-          <Zap size={16} className="text-white" />
-        </div>
-        <span className="text-white font-semibold text-base hidden sm:block">
-          EV Diagnostic Assistant
-        </span>
-      </div>
-
-      {/* Right side controls */}
-      <div className="flex items-center gap-2">
-        <ThemeToggle />
-
-        <button
-          className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
-          aria-label="Share"
-        >
-          <Share2 size={18} />
-        </button>
-
-        <button
-          className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
-          aria-label="Settings"
-        >
-          <Settings size={18} />
-        </button>
-
-        {showLoginButton && !isAuthenticated ? (
-          <button
-            onClick={() => navigate('/login')}
-            className="btn-primary text-sm px-4 py-2 ml-2"
-          >
-            Login
-          </button>
-        ) : isAuthenticated && user ? (
-          <div className="relative ml-2" ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2 p-1 rounded-lg hover:bg-white/5 transition-colors"
-              aria-label="User menu"
-              aria-expanded={dropdownOpen}
-              aria-haspopup="true"
-            >
-              <Avatar username={user.username} size="sm" />
-              <ChevronDown size={14} className="text-slate-400" />
-            </button>
-
-            {dropdownOpen && (
-              <div
-                className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-blue-900/30 shadow-lg z-50 overflow-hidden animate-fade-in"
-                style={{ backgroundColor: '#0d1117' }}
-                role="menu"
-              >
-                <div className="px-4 py-3 border-b border-blue-900/30">
-                  <p className="text-white text-sm font-medium">{user.username}</p>
-                  <p className="text-slate-400 text-xs truncate">{user.email}</p>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-400 hover:bg-red-600/10 transition-colors"
-                  role="menuitem"
-                >
-                  <LogOut size={14} />
-                  Logout
-                </button>
-              </div>
-            )}
+    <>
+      {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
+      <header
+        className="flex items-center justify-between px-6 py-3 border-b border-blue-900/30 flex-shrink-0"
+        style={{ backgroundColor: '#0a0e1a' }}
+      >
+        {/* Logo + Name */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+            <Zap size={16} className="text-white" />
           </div>
-        ) : null}
-      </div>
-    </header>
+          <span className="text-white font-semibold text-base hidden sm:block">
+            EV Diagnostic Assistant
+          </span>
+        </div>
+
+        {/* Right side controls */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleShare}
+            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+            aria-label="Share"
+            title="Share this page"
+          >
+            <Share2 size={18} />
+          </button>
+
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+            aria-label="Settings"
+            title="Settings"
+          >
+            <Settings size={18} />
+          </button>
+
+          {showLoginButton && !isAuthenticated ? (
+            <button
+              onClick={() => navigate('/login')}
+              className="btn-primary text-sm px-4 py-2 ml-2"
+            >
+              Login
+            </button>
+          ) : isAuthenticated && user ? (
+            <div className="relative ml-2" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2 p-1 rounded-lg hover:bg-white/5 transition-colors"
+                aria-label="User menu"
+                aria-expanded={dropdownOpen}
+                aria-haspopup="true"
+              >
+                <Avatar username={user.username} size="sm" />
+                <ChevronDown size={14} className="text-slate-400" />
+              </button>
+
+              {dropdownOpen && (
+                <div
+                  className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-blue-900/30 shadow-lg z-50 overflow-hidden animate-fade-in"
+                  style={{ backgroundColor: '#0d1117' }}
+                  role="menu"
+                >
+                  <div className="px-4 py-3 border-b border-blue-900/30">
+                    <p className="text-white text-sm font-medium">{user.username}</p>
+                    <p className="text-slate-400 text-xs truncate">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-400 hover:bg-red-600/10 transition-colors"
+                    role="menuitem"
+                  >
+                    <LogOut size={14} />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : null}
+        </div>
+      </header>
+    </>
   )
 }

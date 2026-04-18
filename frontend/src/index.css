@@ -116,9 +116,36 @@
   --color-border: rgba(59, 130, 246, 0.3);
 }
 
-.light body {
-  background-color: #f0f4f8;
-  color: #0f172a;
+.light body,
+.light .page-layout,
+.light header,
+.light main {
+  background-color: #f0f4f8 !important;
+  color: #0f172a !important;
+}
+
+.light .text-white {
+  color: #0f172a !important;
+}
+
+.light .text-slate-400,
+.light .text-slate-500 {
+  color: #475569 !important;
+}
+
+.light [style*="background-color: #0a0e1a"],
+.light [style*="backgroundColor: '#0a0e1a'"] {
+  background-color: #f0f4f8 !important;
+}
+
+.light [style*="background-color: #0d1117"],
+.light [style*="background-color: #0f172a"],
+.light [style*="background-color: rgb(13, 17, 23)"] {
+  background-color: #ffffff !important;
+}
+
+.light .border-blue-900\/30 {
+  border-color: rgba(59, 130, 246, 0.3) !important;
 }
 
 /* Pulsing red recording indicator */
