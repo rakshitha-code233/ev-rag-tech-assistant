@@ -22,19 +22,12 @@ venv/
 .env.local
 .env.production.local
 
-# Database files
-*.sqlite3
-*.db
-
-# Chroma DB
-chroma/
-database/
-backend/rag_store/
+# RAG store — commit index so it persists on Render
+# backend/rag_store/
 
 # Frontend build
 frontend/dist/
 frontend/node_modules/
 
-# PDF uploads (too large for git)
-data/manuals/*.pdf
+# PDF uploads (too large for git — remove this line to commit manuals)
 backend/temp.pdf
