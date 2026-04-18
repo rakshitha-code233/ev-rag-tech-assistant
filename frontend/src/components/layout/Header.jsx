@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Share2, Settings, Zap, ChevronDown, LogOut, User, X, Moon, Sun } from 'lucide-react'
+import { Share2, Settings, ChevronDown, LogOut, X } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import Avatar from '../ui/Avatar'
@@ -104,8 +104,8 @@ export default function Header({ showLoginButton = false }) {
       >
         {/* Logo + Name */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <Zap size={16} className="text-white" />
+          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
+            <img src="/ev-logo.svg" alt="EV Logo" className="w-8 h-8" />
           </div>
           <span className="text-white font-semibold text-base hidden sm:block">
             EV Diagnostic Assistant

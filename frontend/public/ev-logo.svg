@@ -1,4 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="8" fill="#2563eb"/>
-  <path d="M18 6L10 18h7l-3 8 10-14h-7l3-8z" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Black background -->
+  <rect width="512" height="512" fill="#000000"/>
+
+  <!-- Outer circle -->
+  <circle cx="256" cy="256" r="230" stroke="#1a3a5c" stroke-width="12" fill="none"/>
+
+  <!-- EV Charging station body -->
+  <rect x="130" y="140" width="110" height="200" rx="10" stroke="#1a3a5c" stroke-width="10" fill="none"/>
+  <!-- Station screen -->
+  <rect x="148" y="158" width="74" height="55" rx="4" stroke="#1a3a5c" stroke-width="8" fill="none"/>
+  <!-- EV text -->
+  <text x="155" y="310" font-family="Arial Black, Arial" font-weight="900" font-size="58" fill="#f97316">EV</text>
+
+  <!-- Car outline (right side) -->
+  <!-- Car roof/body -->
+  <path d="M270 220 Q290 185 330 178 L420 178 Q455 178 465 200 L475 230" stroke="#1a3a5c" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <!-- Car body bottom -->
+  <path d="M265 230 L265 290 Q265 305 280 305 L460 305 Q475 305 475 290 L475 230 Z" stroke="#1a3a5c" stroke-width="10" fill="none"/>
+  <!-- Charging cable from station to car -->
+  <path d="M240 260 Q255 260 265 260" stroke="#1a3a5c" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Front wheel -->
+  <circle cx="310" cy="318" r="32" stroke="#1a3a5c" stroke-width="10" fill="none"/>
+  <circle cx="310" cy="318" r="10" stroke="#1a3a5c" stroke-width="6" fill="none"/>
+  <!-- Rear wheel -->
+  <circle cx="435" cy="318" r="32" stroke="#1a3a5c" stroke-width="10" fill="none"/>
+  <circle cx="435" cy="318" r="10" stroke="#1a3a5c" stroke-width="6" fill="none"/>
+  <!-- Car underbody -->
+  <path d="M278 305 L278 318" stroke="#1a3a5c" stroke-width="8" fill="none"/>
+  <path d="M467 305 L467 318" stroke="#1a3a5c" stroke-width="8" fill="none"/>
 </svg>
