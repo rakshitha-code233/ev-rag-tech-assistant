@@ -16,35 +16,21 @@ STOPWORDS = {
     "an",
     "and",
     "are",
-    "car",
-    "check",
     "do",
     "does",
-    "ev",
     "for",
     "how",
     "i",
     "is",
     "it",
-    "level",
-    "locate",
-    "located",
-    "long",
-    "manual",
     "me",
-    "model",
     "my",
     "of",
     "on",
-    "port",
     "should",
-    "take",
     "tell",
-    "tesla",
     "the",
     "to",
-    "type",
-    "types",
     "what",
     "where",
     "with",
@@ -81,25 +67,35 @@ def select_relevant_chunks(query: str):
         if not query_terms:
             continue
 
-        if is_definition_query and chunk.score < 0.55:
+        if is_definition_query and chunk.score < 0.45:
             continue
 
         if len(overlap) >= 2:
             relevant_chunks.append(chunk)
             continue
 
-        if len(query_terms) <= 2 and overlap and chunk.score >= 0.6:
+        # Single keyword match with decent score
+        if overlap and chunk.score >= 0.5:
+            relevant_chunks.append(chunk)
+            continue
+
+        # High score even without keyword overlap (hash embedder can still find relevant chunks)
+        if chunk.score >= 0.65:
             relevant_chunks.append(chunk)
 
     return relevant_chunks
 
 
 def handle_greetings(query: str) -> str | None:
-    normalized = query.lower().strip()
-    if normalized in {"hi", "hello", "hey"}:
-        return "Hello. Ask me about EV diagnostics and I will answer from the indexed manuals with page citations."
-    if "thank" in normalized:
-        return "You're welcome."
+    normalized = query.lower().strip().rstrip('!.,?')
+
+    # Greetings
+    if normalized in {"hi", "hello", "hey", "hii", "helo", "helo there", "hi there", "hey there", "greetings"}:
+        return "Hello! I'm the EV Diagnostic Assistant. Ask me anything about EV diagnostics, fault codes, charging, or repair procedures and I'll answer from your uploaded manuals with page citations."
+
+    # Thanks
+    if any(word in normalized for word in ["thank", "thanks", "thank you", "thankyou", "thx"]):
+        return "You're welcome! Feel free to ask anything else about your EV."
 
     # Identity questions
     identity_patterns = [
@@ -112,6 +108,9 @@ def handle_greetings(query: str) -> str | None:
         "introduce yourself",
         "what are you",
         "what do you do",
+        "who made you",
+        "what can you do",
+        "how can you help",
     ]
     for pattern in identity_patterns:
         if pattern in normalized:

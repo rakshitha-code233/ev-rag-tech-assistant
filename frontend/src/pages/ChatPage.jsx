@@ -10,7 +10,7 @@ import { saveConversation, getConversation, updateConversation } from '../servic
 import api from '../services/api'
 import { Bot } from 'lucide-react'
 
-function EmptyState() {
+function EmptyState({ onSuggestion }) {
   return (
     <div className="flex flex-col items-center justify-center h-full text-center px-4">
       <div className="w-16 h-16 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center mb-4">
@@ -31,10 +31,7 @@ function EmptyState() {
           <button
             key={suggestion}
             className="text-left px-4 py-2.5 rounded-lg border border-blue-900/40 text-slate-400 text-xs hover:text-white hover:border-blue-500/40 hover:bg-blue-500/5 transition-all"
-            onClick={() => {
-              // Dispatch a custom event to pre-fill the input
-              window.dispatchEvent(new CustomEvent('chat-suggestion', { detail: suggestion }))
-            }}
+            onClick={() => onSuggestion(suggestion)}
           >
             {suggestion}
           </button>
@@ -141,7 +138,7 @@ export default function ChatPage() {
                 <div className="text-slate-400 text-sm">Loading conversation…</div>
               </div>
             ) : messages.length === 0 ? (
-              <EmptyState />
+              <EmptyState onSuggestion={handleSubmit} />
             ) : (
               <div className="max-w-3xl mx-auto space-y-4">
                 {messages.map((msg, idx) => (
