@@ -417,5 +417,15 @@ def health():
 init_db()
 init_chat_history_table()
 
+# Build RAG index on startup if manuals exist but index is missing
+try:
+    from rag import INDEX_FILE, METADATA_FILE, list_manual_files, build_manual_index
+    if list_manual_files() and (not INDEX_FILE.exists() or not METADATA_FILE.exists()):
+        app.logger.info("RAG index missing — rebuilding from %d manuals", len(list_manual_files()))
+        build_manual_index()
+        app.logger.info("RAG index rebuilt successfully")
+except Exception as e:
+    app.logger.warning("RAG index build failed on startup: %s", e)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

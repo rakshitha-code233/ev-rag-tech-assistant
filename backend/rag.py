@@ -214,7 +214,7 @@ def retrieve_manual_chunks(query: str, top_k: int = DEFAULT_TOP_K) -> List[Retri
             continue
 
         item = store["metadata"][idx]
-        if score < 0.25:
+        if score < 0.20:
             continue
 
         retrieved.append(

@@ -75,12 +75,12 @@ def select_relevant_chunks(query: str):
             continue
 
         # Single keyword match with decent score
-        if overlap and chunk.score >= 0.5:
+        if overlap and chunk.score >= 0.35:
             relevant_chunks.append(chunk)
             continue
 
         # High score even without keyword overlap (hash embedder can still find relevant chunks)
-        if chunk.score >= 0.65:
+        if chunk.score >= 0.50:
             relevant_chunks.append(chunk)
 
     return relevant_chunks
