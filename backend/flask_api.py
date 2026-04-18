@@ -43,11 +43,6 @@ CORS(
     supports_credentials=False,
 )
 
-# Initialize DB tables on startup (works with both gunicorn and direct run)
-with app.app_context():
-    init_db()
-    init_chat_history_table()
-
 BASE_DIR = Path(__file__).resolve().parent
 USERS_DB = BASE_DIR / "users.db"
 
@@ -394,7 +389,9 @@ def health():
 # Entry point
 # ---------------------------------------------------------------------------
 
+# Initialize DB tables on startup — runs for both gunicorn and direct execution
+init_db()
+init_chat_history_table()
+
 if __name__ == "__main__":
-    init_db()
-    init_chat_history_table()
     app.run(host="0.0.0.0", port=5000, debug=True)
