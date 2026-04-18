@@ -24,10 +24,20 @@ from rag import DATA_DIR, build_manual_index, list_manual_files
 # App setup
 # ---------------------------------------------------------------------------
 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "")
+
+_cors_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://ev-rag-tech-assistant-frontend.onrender.com",
+]
+if FRONTEND_URL and FRONTEND_URL not in _cors_origins:
+    _cors_origins.append(FRONTEND_URL)
+
 app = Flask(__name__)
 CORS(
     app,
-    origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    origins=_cors_origins,
     allow_headers=["Content-Type", "Authorization"],
     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     supports_credentials=False,
