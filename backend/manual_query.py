@@ -100,6 +100,29 @@ def handle_greetings(query: str) -> str | None:
         return "Hello. Ask me about EV diagnostics and I will answer from the indexed manuals with page citations."
     if "thank" in normalized:
         return "You're welcome."
+
+    # Identity questions
+    identity_patterns = [
+        "what is your name",
+        "what's your name",
+        "whats your name",
+        "who are you",
+        "tell me about you",
+        "tell me about yourself",
+        "introduce yourself",
+        "what are you",
+        "what do you do",
+    ]
+    for pattern in identity_patterns:
+        if pattern in normalized:
+            return (
+                "I'm the EV Diagnostic Assistant — an AI-powered tool built to help "
+                "service technicians and EV owners troubleshoot electric vehicles. "
+                "I answer questions about fault codes, repair procedures, charging, "
+                "battery systems, and more — directly from uploaded repair manuals with "
+                "exact page citations. Upload a PDF manual and ask me anything about your EV."
+            )
+
     return None
 
 

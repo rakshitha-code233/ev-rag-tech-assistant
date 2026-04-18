@@ -20,7 +20,6 @@ export async function uploadManual(file, onProgress) {
   formData.append('file', file)
 
   const response = await api.post('/api/manuals/upload', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress: (progressEvent) => {
       if (onProgress && progressEvent.total) {
         const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
@@ -37,6 +36,6 @@ export async function uploadManual(file, onProgress) {
  * @returns {Promise<{message: string}>}
  */
 export async function deleteManual(filename) {
-  const response = await api.delete(`/api/manuals/${encodeURIComponent(filename)}`)
+  const response = await api.delete(`/api/manuals/${filename}`)
   return response.data
 }
