@@ -1,5 +1,5 @@
 // Service Worker for EV Diagnostic Assistant PWA
-const CACHE_NAME = 'ev-diag-v1'
+const CACHE_NAME = 'ev-diag-v3'
 
 self.addEventListener('install', (event) => {
   self.skipWaiting()
