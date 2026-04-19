@@ -101,7 +101,7 @@ export default function Header({ showLoginButton = false }) {
     <>
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
       <header
-        className="flex items-center justify-between px-6 py-3 border-b border-blue-900/30 flex-shrink-0"
+        className="flex items-center justify-between pl-16 pr-4 lg:px-6 py-3 border-b border-blue-900/30 flex-shrink-0"
         style={{ backgroundColor: '#0a0e1a' }}
       >
         {/* App name only - logo is in sidebar */}
