@@ -1,9 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Bot, FileText, Clock, Zap, ChevronRight } from 'lucide-react'
+import { Bot, FileText, Clock, Zap, ChevronRight, Share2, Settings, X } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import ThemeToggle from '../components/ui/ThemeToggle'
-import { Share2, Settings } from 'lucide-react'
+import { useTheme } from '../contexts/ThemeContext'
 
 const FEATURE_CARDS = [
   {
@@ -117,17 +116,58 @@ function EVCarIllustration() {
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
-  // Redirect authenticated users to dashboard
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/dashboard', { replace: true })
     }
   }, [isAuthenticated, navigate])
 
+  const handleShare = async () => {
+    const shareUrl = `${window.location.protocol}//${window.location.host}`
+    const shareData = {
+      title: 'EV Diagnostic Assistant',
+      text: 'AI-powered EV diagnostics — Smart • Reliable • Electric',
+      url: shareUrl,
+    }
+    if (navigator.share) {
+      try { await navigator.share(shareData) } catch {}
+    } else {
+      await navigator.clipboard.writeText(shareUrl)
+      alert('Link copied to clipboard!')
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#0a0e1a' }}>
+      {/* Settings Modal */}
+      {settingsOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setSettingsOpen(false)}>
+          <div className="w-80 rounded-2xl border border-blue-900/30 shadow-xl p-6" style={{ backgroundColor: '#0d1117' }} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-white font-semibold text-base">Settings</h2>
+              <button onClick={() => setSettingsOpen(false)} className="text-slate-400 hover:text-white"><X size={18} /></button>
+            </div>
+            <div className="flex items-center justify-between py-3 border-b border-blue-900/20">
+              <div>
+                <p className="text-white text-sm font-medium">Dark Mode</p>
+                <p className="text-slate-500 text-xs mt-0.5">Toggle light / dark theme</p>
+              </div>
+              <button onClick={toggleTheme} className={`relative w-12 h-6 rounded-full transition-colors ${theme === 'dark' ? 'bg-blue-600' : 'bg-slate-600'}`}>
+                <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${theme === 'dark' ? 'translate-x-7' : 'translate-x-1'}`} />
+              </button>
+            </div>
+            <div className="flex items-center justify-between py-3">
+              <p className="text-white text-sm font-medium">App Version</p>
+              <p className="text-slate-500 text-xs">v1.0</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-blue-900/20">
         <div className="flex items-center gap-3">
@@ -135,19 +175,16 @@ export default function LandingPage() {
           <span className="text-white font-semibold text-base">EV Diagnostic Assistant</span>
         </div>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <button className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="Share">
+          <button onClick={toggleTheme} className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="Toggle theme">
+            {theme === 'dark' ? <span>☀️</span> : <span>🌙</span>}
+          </button>
+          <button onClick={handleShare} className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="Share">
             <Share2 size={18} />
           </button>
-          <button className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="Settings">
+          <button onClick={() => setSettingsOpen(true)} className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="Settings">
             <Settings size={18} />
           </button>
-          <button
-            onClick={() => navigate('/login')}
-            className="btn-primary text-sm px-4 py-2 ml-2"
-          >
-            Login
-          </button>
+          <button onClick={() => navigate('/login')} className="btn-primary text-sm px-4 py-2 ml-2">Login</button>
         </div>
       </header>
 
