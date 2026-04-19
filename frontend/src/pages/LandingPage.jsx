@@ -131,9 +131,7 @@ export default function LandingPage() {
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-blue-900/20">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <Zap size={16} className="text-white" />
-          </div>
+          <img src="/ev-app-icon.png" alt="EV Logo" className="w-8 h-8 rounded-lg" />
           <span className="text-white font-semibold text-base">EV Diagnostic Assistant</span>
         </div>
         <div className="flex items-center gap-2">
