@@ -94,11 +94,17 @@ export default function Sidebar() {
     <>
       {/* Mobile hamburger button */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-slate-800 text-white"
+        className="lg:hidden fixed top-3 left-3 z-50 w-10 h-10 flex items-center justify-center rounded-xl overflow-hidden shadow-lg"
         onClick={() => setMobileOpen(!mobileOpen)}
         aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
       >
-        {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+        {mobileOpen ? (
+          <div className="w-10 h-10 bg-slate-800 flex items-center justify-center rounded-xl">
+            <X size={20} className="text-white" />
+          </div>
+        ) : (
+          <img src="/ev-app-icon.png" alt="Menu" className="w-10 h-10 rounded-xl object-cover" />
+        )}
       </button>
 
       {/* Mobile overlay */}

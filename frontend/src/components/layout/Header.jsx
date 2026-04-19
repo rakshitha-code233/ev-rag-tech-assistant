@@ -153,13 +153,13 @@ export default function Header({ showLoginButton = false }) {
 
               {dropdownOpen && (
                 <div
-                  className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-blue-900/30 shadow-lg z-50 overflow-hidden animate-fade-in"
-                  style={{ backgroundColor: '#0d1117' }}
+                  className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-slate-700 shadow-xl z-50 overflow-hidden animate-fade-in"
+                  style={{ backgroundColor: '#1e293b' }}
                   role="menu"
                 >
-                  <div className="px-4 py-3 border-b border-blue-900/30">
-                    <p className="text-white text-sm font-medium">{user.username}</p>
-                    <p className="text-slate-400 text-xs truncate">{user.email}</p>
+                  <div className="px-4 py-3 border-b border-slate-700">
+                    <p className="text-white text-sm font-semibold">{user.username}</p>
+                    <p className="text-slate-300 text-xs truncate mt-0.5">{user.email}</p>
                   </div>
                   <button
                     onClick={handleLogout}
