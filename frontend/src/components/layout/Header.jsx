@@ -102,12 +102,9 @@ export default function Header({ showLoginButton = false }) {
         className="flex items-center justify-between px-6 py-3 border-b border-blue-900/30 flex-shrink-0"
         style={{ backgroundColor: '#0a0e1a' }}
       >
-        {/* Logo + Name */}
+        {/* App name only - logo is in sidebar */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
-            <img src="/ev-logo.svg" alt="EV Logo" className="w-8 h-8" />
-          </div>
-          <span className="text-white font-semibold text-base hidden sm:block">
+          <span className="text-white font-semibold text-base">
             EV Diagnostic Assistant
           </span>
         </div>
