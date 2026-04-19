@@ -77,10 +77,12 @@ export default function Header({ showLoginButton = false }) {
   }
 
   const handleShare = async () => {
+    // Always share the root URL so unauthenticated users land on the landing page
+    const shareUrl = `${window.location.protocol}//${window.location.host}`
     const shareData = {
       title: 'EV Diagnostic Assistant',
-      text: 'AI-powered EV diagnostics grounded in repair manuals',
-      url: window.location.href,
+      text: 'AI-powered EV diagnostics grounded in repair manuals — Smart • Reliable • Electric',
+      url: shareUrl,
     }
     if (navigator.share) {
       try {
@@ -90,7 +92,7 @@ export default function Header({ showLoginButton = false }) {
       }
     } else {
       // Fallback: copy URL to clipboard
-      await navigator.clipboard.writeText(window.location.href)
+      await navigator.clipboard.writeText(shareUrl)
       alert('Link copied to clipboard!')
     }
   }
