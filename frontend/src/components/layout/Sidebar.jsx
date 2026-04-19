@@ -36,7 +36,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className={`flex items-center border-b border-blue-900/30 ${collapsed ? 'justify-center px-2 py-4' : 'gap-3 px-4 py-4'}`}>
         <img
-          src="/ev-logo.svg"
+          src="/ev-app-icon.png"
           alt="EV Logo"
           className="w-9 h-9 flex-shrink-0 rounded-lg"
         />
