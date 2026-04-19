@@ -105,8 +105,8 @@ export default function Header({ showLoginButton = false }) {
         style={{ backgroundColor: '#0a0e1a' }}
       >
         {/* App name only - logo is in sidebar */}
-        <div className="flex items-center gap-3">
-          <span className="text-white font-semibold text-base">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-white font-semibold text-base whitespace-nowrap">
             EV Diagnostic Assistant
           </span>
         </div>
@@ -158,12 +158,13 @@ export default function Header({ showLoginButton = false }) {
                   role="menu"
                 >
                   <div className="px-4 py-3 border-b border-slate-700">
-                    <p className="text-white text-sm font-semibold">{user.username}</p>
-                    <p className="text-slate-300 text-xs truncate mt-0.5">{user.email}</p>
+                    <p style={{ color: '#ffffff', fontSize: '0.875rem', fontWeight: 600 }}>{user.username}</p>
+                    <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '2px' }} className="truncate">{user.email}</p>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-400 hover:bg-red-600/10 transition-colors"
+                    className="flex items-center gap-2 w-full px-4 py-2.5 text-sm hover:bg-red-600/10 transition-colors"
+                    style={{ color: '#f87171' }}
                     role="menuitem"
                   >
                     <LogOut size={14} />
