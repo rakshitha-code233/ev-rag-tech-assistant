@@ -29,7 +29,6 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 _cors_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://ev-rag-tech-assistant-frontend.onrender.com",
     "https://ev-rag-tech-assistant.vercel.app",
 ]
 if FRONTEND_URL and FRONTEND_URL not in _cors_origins:
