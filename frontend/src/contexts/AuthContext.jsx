@@ -37,6 +37,7 @@ export function AuthProvider({ children }) {
     }
     return null
   })
+  const [loading, setLoading] = useState(true)
 
   // Validate token on mount + listen for forced logout from API interceptor
   useEffect(() => {
@@ -52,6 +53,7 @@ export function AuthProvider({ children }) {
       setToken(null)
       setUser(null)
     }
+    setLoading(false)
 
     // Listen for 401 events from the Axios interceptor
     const handleForceLogout = () => {
@@ -87,6 +89,7 @@ export function AuthProvider({ children }) {
     register,
     logout,
     isAuthenticated: !!token && isTokenValid(token),
+    loading,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

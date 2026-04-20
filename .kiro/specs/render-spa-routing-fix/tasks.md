@@ -1,0 +1,137 @@
+# Implementation Plan
+
+- [x] 1. Write bug condition exploration test
+  - **Property 1: Bug Condition** - Non-Homepage Routes Return Blank Pages
+  - **CRITICAL**: This test MUST FAIL on unfixed deployment - failure confirms the bug exists
+  - **DO NOT attempt to fix the test or the configuration when it fails**
+  - **NOTE**: This test encodes the expected behavior - it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate the bug exists on the deployed Render site
+  - **Manual Testing Approach**: Since this is a deployment configuration issue, automated property-based testing is not directly applicable. Instead, perform systematic manual testing on the deployed Render site.
+  - Test implementation details from Bug Condition in design:
+    - Navigate to ev-rag-tech-assistant-frontend.onrender.com/login and refresh → Document if blank page appears
+    - Navigate to /dashboard and refresh → Document if blank page appears
+    - Navigate to /chat and refresh → Document if blank page appears
+    - Navigate to /history and refresh → Document if blank page appears
+    - Navigate to /upload and refresh → Document if blank page appears
+    - Type full URL (e.g., .../login) directly in address bar → Document if blank page appears
+    - Navigate to /chat/123 (dynamic route) and refresh → Document if blank page appears
+  - Use browser DevTools Network tab to inspect:
+    - HTTP status codes (expecting 404 or incorrect response)
+    - Response body (expecting empty or error page instead of index.html)
+    - Content-Type headers
+    - Whether index.html is served at all
+  - Run test on UNFIXED deployment (current Render configuration)
+  - **EXPECTED OUTCOME**: Test FAILS (blank pages observed) - this is correct and proves the bug exists
+  - Document counterexamples found:
+    - Which routes show blank pages
+    - What HTTP status codes are returned
+    - What response body is received
+    - Any error messages in browser console
+  - Mark task complete when manual testing is performed, failures are documented, and root cause is understood
+  - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
+
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - Existing Functionality Remains Unchanged
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED deployment for non-buggy cases:
+    - Navigate to homepage (/) and refresh → Document that landing page loads correctly
+    - Click in-app navigation links (e.g., Login button, Dashboard link) → Document smooth navigation without page reloads
+    - Test authentication flow: login, logout, access protected routes → Document correct behavior
+    - Access /dashboard without authentication → Document redirect to /login
+    - Navigate to /nonexistent (invalid route) → Document redirect to homepage
+    - Verify API calls work (e.g., login, chat queries) → Document successful API communication
+    - Check static assets load (CSS, JS, images) → Document no broken assets
+    - Run app locally with `npm run dev` → Document all routes work in development
+  - Write manual test checklist capturing observed behavior patterns from Preservation Requirements:
+    - Homepage loading on refresh (should remain working)
+    - In-app navigation without page reloads (should remain working)
+    - Authentication flows and redirects (should remain working)
+    - Invalid route fallback to homepage (should remain working)
+    - Development environment routing (should remain working)
+  - Run tests on UNFIXED deployment
+  - **EXPECTED OUTCOME**: Tests PASS (existing functionality works) - this confirms baseline behavior to preserve
+  - Mark task complete when manual tests are documented and verified passing on unfixed deployment
+  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+
+- [ ] 3. Fix Render SPA routing configuration
+
+  - [x] 3.1 Verify and update render.yaml configuration
+    - Review Render's official documentation for static site SPA routing best practices
+    - Verify current render.yaml syntax and structure:
+      - Confirm service type is "web" with runtime "static"
+      - Check buildCommand and staticPublishPath are correct
+      - Verify routes section is properly formatted
+    - Update render.yaml with correct SPA routing configuration:
+      - Ensure rewrite rule uses correct Render syntax: `source: /*` and `destination: /index.html`
+      - Verify proper YAML indentation (2 spaces, not tabs)
+      - Add explicit error page handling if supported by Render
+      - Consider adding headers for cache control if needed
+    - _Bug_Condition: isBugCondition(request) where request.url.path != '/' AND request.type IN ['direct_access', 'page_refresh']_
+    - _Expected_Behavior: Server serves index.html with 200 status for all non-homepage routes, allowing React Router to handle client-side routing_
+    - _Preservation: Homepage loading, in-app navigation, authentication flows, and development environment routing must remain unchanged_
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 3.1, 3.2, 3.3, 3.4, 3.5_
+
+  - [x] 3.2 Remove conflicting _redirects file
+    - Remove or rename `frontend/public/_redirects` file (Netlify format not supported by Render)
+    - Document in comments or README that Render uses render.yaml for routing configuration
+    - Ensure build process doesn't copy unnecessary redirect files to dist/
+    - _Preservation: This change should not affect functionality since Render doesn't use _redirects format_
+    - _Requirements: 2.6_
+
+  - [x] 3.3 Deploy updated configuration to Render
+    - Commit changes to render.yaml (and removal of _redirects)
+    - Push to main branch or create deployment branch
+    - Trigger Render deployment (automatic or manual)
+    - Monitor Render deployment logs for:
+      - Configuration parsing errors
+      - Build success/failure
+      - Any warnings about routing configuration
+    - Clear any platform-level caches if available in Render dashboard
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
+
+  - [x] 3.4 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - Non-Homepage Routes Serve Index.html Correctly
+    - **IMPORTANT**: Re-run the SAME manual tests from task 1 - do NOT write new tests
+    - The tests from task 1 encode the expected behavior
+    - When these tests pass, it confirms the expected behavior is satisfied
+    - Manually test all non-homepage routes on the FIXED Render deployment:
+      - Navigate to /login and refresh → Verify login form displays correctly
+      - Navigate to /dashboard and refresh → Verify dashboard loads (or redirects to login if not authenticated)
+      - Navigate to /chat and refresh → Verify chat interface loads
+      - Navigate to /history and refresh → Verify history page loads
+      - Navigate to /upload and refresh → Verify upload page loads
+      - Type full URL in address bar → Verify page loads correctly
+      - Navigate to /chat/123 and refresh → Verify dynamic route loads
+      - Bookmark a route, close browser, reopen bookmark → Verify page loads
+      - Copy URL, open in new incognito window → Verify page loads
+    - Use browser DevTools to verify:
+      - HTTP status is 200 for all routes
+      - Response body contains index.html with `<div id="root"></div>`
+      - Content-Type is text/html
+      - React Router loads and displays correct page content
+    - **EXPECTED OUTCOME**: All tests PASS (no more blank pages) - confirms bug is fixed
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
+
+  - [x] 3.5 Verify preservation tests still pass
+    - **Property 2: Preservation** - Existing Functionality Unchanged After Fix
+    - **IMPORTANT**: Re-run the SAME manual tests from task 2 - do NOT write new tests
+    - Run preservation manual tests on FIXED deployment:
+      - Navigate to homepage (/) and refresh → Verify landing page loads correctly (same as before)
+      - Click in-app navigation links → Verify smooth navigation without page reloads (same as before)
+      - Test authentication flow: login, logout, protected routes → Verify correct behavior (same as before)
+      - Access /dashboard without auth → Verify redirect to /login (same as before)
+      - Navigate to /nonexistent → Verify redirect to homepage (same as before)
+      - Verify API calls work correctly → Verify successful API communication (same as before)
+      - Check static assets load → Verify no broken assets (same as before)
+      - Run app locally with `npm run dev` → Verify all routes work in development (same as before)
+    - **EXPECTED OUTCOME**: All tests PASS (no regressions) - confirms existing functionality preserved
+    - Confirm all preservation tests still pass after fix
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Verify all manual tests from bug condition exploration (task 1) now pass on fixed deployment
+  - Verify all manual tests from preservation checking (task 2) still pass on fixed deployment
+  - Document any issues or edge cases discovered during testing
+  - If any tests fail, investigate root cause and apply additional fixes
+  - Consider creating automated regression tests (Node.js script) for future deployments
+  - Ask the user if questions arise or if additional testing is needed

@@ -38,6 +38,12 @@ vi.mock('../contexts/AuthContext', () => ({
   AuthProvider: ({ children }) => children,
 }))
 
+// Mock ThemeContext to avoid provider errors
+vi.mock('../contexts/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: vi.fn() }),
+  ThemeProvider: ({ children }) => children,
+}))
+
 // Mock the health-check API call made by ChatPage on mount
 vi.mock('../services/api', () => ({
   default: {
