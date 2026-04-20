@@ -135,19 +135,19 @@ def get_groq_client() -> Groq | None:
 def build_manual_only_prompt(query: str, context: str) -> List[dict]:
     system_prompt = (
         "You are an EV diagnostic assistant for service technicians. "
-        "Answer only from the provided repair manual excerpts. "
-        "You may answer diagnostic or owner-manual questions when the excerpts support them. "
-        "If the excerpts answer only part of the question, answer the supported parts and clearly say what is missing. "
-        "Prefer step-by-step procedures, safety checks, and exact manual guidance. "
-        "Cite source numbers inline like [Source 1] when you use them."
+        "Answer ONLY from the provided repair manual excerpts. "
+        "Use exact terminology from the manuals, not paraphrased versions. "
+        "Cite source numbers inline like [Source 1] when you reference information. "
+        "If the excerpts don't answer the question, say 'The provided manual excerpts do not contain information on...' "
+        "Format your response as:\n"
+        "ANSWER:\n[Your answer with inline citations like [Source 1]]\n\n"
+        "PROCEDURE:\n[Numbered steps if available, or 'None' if no steps in excerpts]\n\n"
+        "Do NOT add a separate Citations section - only use inline [Source N] citations."
     )
     user_prompt = (
-        f"Technician question:\n{query}\n\n"
+        f"Question: {query}\n\n"
         f"Manual excerpts:\n{context}\n\n"
-        "Respond with:\n"
-        "1. A concise answer.\n"
-        "2. A 'Procedure' section with numbered steps only when the excerpts contain steps.\n"
-        "3. A 'Citations' section mapping each used source number to its manual/page."
+        "Respond in the exact format specified above."
     )
     return [
         {"role": "system", "content": system_prompt},
@@ -203,7 +203,24 @@ def get_answer(query: str) -> str:
     except Exception:
         return build_extract_answer(query)
 
-    if "Citations:" not in answer:
+    # Extract inline citations from answer and build proper citations section
+    citation_pattern = r'\[Source\s+(\d+)\]'
+    used_sources = set()
+    for match in re.finditer(citation_pattern, answer):
+        source_num = int(match.group(1))
+        if 1 <= source_num <= len(chunks):
+            used_sources.add(source_num)
+    
+    # Build citations section with only used sources
+    if used_sources:
+        citations_section = "\n\nCitations:\n"
+        for source_num in sorted(used_sources):
+            if 1 <= source_num <= len(chunks):
+                chunk = chunks[source_num - 1]
+                citations_section += f"[Source {source_num}] - {chunk.manual} p.{chunk.page}\n"
+        answer = answer + citations_section
+    elif citations:
+        # Fallback: add all citations if none were referenced
         answer = answer + "\n\nCitations:\n" + "\n".join(f"- {citation}" for citation in citations)
 
     return answer
