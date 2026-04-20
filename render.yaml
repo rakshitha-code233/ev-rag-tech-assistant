@@ -1,6 +1,9 @@
 services:
   - type: web
     name: ev-rag-tech-assistant-frontend
-    runtime: static
+    runtime: node
     buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
+    startCommand: cd frontend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
