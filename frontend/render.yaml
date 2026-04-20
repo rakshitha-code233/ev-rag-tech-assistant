@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ev-diagnostic-frontend
+    name: ev-rag-tech-assistant-frontend
     runtime: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
@@ -8,6 +8,9 @@ services:
       - path: /*
         name: Cache-Control
         value: no-cache
+      - path: /static/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
     routes:
       - type: rewrite
         source: /*
