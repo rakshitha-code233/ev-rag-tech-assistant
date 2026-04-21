@@ -26,13 +26,14 @@ from rag_improved import DATA_DIR, build_manual_index, list_manual_files
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 
+# Allow all Vercel preview URLs and production URLs
 _cors_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://ev-rag-tech-assistant.vercel.app",
     "https://ev-rag-tech-assistant-frontend.vercel.app",
-    "https://ev-rag-tech-assistant-5axjsnmig-rakshitha-code233s-projects.vercel.app",
-    "https://ev-rag-tech-assistant-Sasjsnmig-rakshitha-code233s-projects.vercel.app",
+    # Allow all Vercel preview URLs (*.vercel.app)
+    "https://*.vercel.app",
 ]
 if FRONTEND_URL and FRONTEND_URL not in _cors_origins:
     _cors_origins.append(FRONTEND_URL)
