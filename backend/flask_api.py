@@ -18,7 +18,7 @@ from flask_cors import CORS
 
 from db import init_db, login_user, register_user
 from manual_query import get_answer
-from rag import DATA_DIR, build_manual_index, list_manual_files
+from rag_improved import DATA_DIR, build_manual_index, list_manual_files
 
 # ---------------------------------------------------------------------------
 # App setup
@@ -49,7 +49,7 @@ USERS_DB = BASE_DIR / "users.db"
 
 JWT_SECRET = os.getenv("JWT_SECRET", "ev_diag_secret_change_in_production")
 JWT_ALGORITHM = "HS256"
-JWT_EXPIRY_HOURS = 24
+JWT_EXPIRY_HOURS = 24 * 30  # 30 days instead of 24 hours
 
 # ---------------------------------------------------------------------------
 # DB helpers
@@ -419,7 +419,7 @@ init_chat_history_table()
 
 # Always rebuild RAG index on startup to ensure compatibility with current faiss/numpy versions
 try:
-    from rag import list_manual_files, build_manual_index
+    from rag_improved import list_manual_files, build_manual_index
     manuals = list_manual_files()
     if manuals:
         app.logger.info("Rebuilding RAG index from %d manuals on startup", len(manuals))

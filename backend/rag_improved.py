@@ -257,7 +257,13 @@ def retrieve_manual_chunks(query: str, top_k: Optional[int] = None) -> List[Retr
     
     # Build retrieved chunks
     retrieved: List[RetrievedChunk] = []
-    metadata = index_data["metadata"]
+    metadata_dict = index_data["metadata"]
+    
+    # Handle both old format (list) and new format (dict with "chunks" key)
+    if isinstance(metadata_dict, dict):
+        metadata = metadata_dict.get("chunks", [])
+    else:
+        metadata = metadata_dict
     
     for score, idx in zip(distances[0], indices[0]):
         if idx < 0 or idx >= len(metadata):
@@ -267,7 +273,7 @@ def retrieve_manual_chunks(query: str, top_k: Optional[int] = None) -> List[Retr
         if score < config.score_threshold:
             continue
         
-        item = metadata[idx]
+        item = metadata[int(idx)]
         chunk = RetrievedChunk(
             manual=str(item["manual"]),
             page=int(item["page"]),
@@ -389,3 +395,37 @@ def clear_cache():
     _config = None
     
     logger.info("Cache cleared")
+
+
+def format_context(chunks: List[RetrievedChunk]) -> str:
+    """Format chunks as numbered context for LLM.
+    
+    Args:
+        chunks: List of retrieved chunks
+        
+    Returns:
+        Formatted context string with source numbers
+    """
+    blocks = []
+    for idx, chunk in enumerate(chunks, start=1):
+        blocks.append(f"[Source {idx}] {chunk.manual} p.{chunk.page}\n{chunk.text}")
+    return "\n\n".join(blocks)
+
+
+def format_citations(chunks: List[RetrievedChunk]) -> List[str]:
+    """Format citations from chunks.
+    
+    Args:
+        chunks: List of retrieved chunks
+        
+    Returns:
+        List of formatted citations (deduplicated)
+    """
+    citations: List[str] = []
+    seen = set()
+    for chunk in chunks:
+        citation = f"{chunk.manual} p.{chunk.page}"
+        if citation not in seen:
+            seen.add(citation)
+            citations.append(citation)
+    return citations
