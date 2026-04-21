@@ -30,6 +30,7 @@ _cors_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://ev-rag-tech-assistant.vercel.app",
+    "https://ev-rag-tech-assistant-frontend.vercel.app",
 ]
 if FRONTEND_URL and FRONTEND_URL not in _cors_origins:
     _cors_origins.append(FRONTEND_URL)
