@@ -32,6 +32,7 @@ _cors_origins = [
     "https://ev-rag-tech-assistant.vercel.app",
     "https://ev-rag-tech-assistant-frontend.vercel.app",
     "https://ev-rag-tech-assistant-5axjsnmig-rakshitha-code233s-projects.vercel.app",
+    "https://ev-rag-tech-assistant-Sasjsnmig-rakshitha-code233s-projects.vercel.app",
 ]
 if FRONTEND_URL and FRONTEND_URL not in _cors_origins:
     _cors_origins.append(FRONTEND_URL)
