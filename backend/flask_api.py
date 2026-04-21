@@ -180,8 +180,6 @@ def login():
 @app.route("/api/chat", methods=["POST"])
 @require_auth
 def chat():
-    import threading
-    
     data = request.get_json(silent=True) or {}
     message = (data.get("message") or "").strip()
     if not message:
@@ -193,7 +191,11 @@ def chat():
         app.logger.info(f"Chat response generated successfully")
     except Exception as exc:
         app.logger.error(f"Chat service error: {exc}", exc_info=True)
-        return jsonify({"error": f"Chat service error: {str(exc)[:100]}"}), 500
+        # Return a helpful error message
+        error_msg = str(exc)[:100]
+        if "timeout" in error_msg.lower() or "out of memory" in error_msg.lower():
+            return jsonify({"error": "Chat service is processing your request. Please try again in a moment."}), 503
+        return jsonify({"error": f"Chat service error: {error_msg}"}), 500
 
     return jsonify({"answer": answer})
 
