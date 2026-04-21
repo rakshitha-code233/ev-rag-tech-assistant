@@ -180,6 +180,8 @@ def login():
 @app.route("/api/chat", methods=["POST"])
 @require_auth
 def chat():
+    import threading
+    
     data = request.get_json(silent=True) or {}
     message = (data.get("message") or "").strip()
     if not message:
@@ -474,6 +476,17 @@ def health():
 # Initialize DB tables on startup — runs for both gunicorn and direct execution
 init_db()
 init_chat_history_table()
+
+# Pre-load RAG components to avoid timeout on first chat request
+try:
+    app.logger.info("Pre-loading RAG embedder model...")
+    from rag_improved import get_embedder
+    embedder = get_embedder()
+    # Trigger model loading by getting the dimension
+    _ = embedder.embedding_dimension
+    app.logger.info("RAG embedder model loaded successfully")
+except Exception as e:
+    app.logger.warning(f"Failed to pre-load embedder: {e}. It will be loaded on first chat request.")
 
 # Skip RAG index rebuild on startup to avoid memory issues on deployment
 # Index will be rebuilt automatically when manuals are uploaded/deleted
