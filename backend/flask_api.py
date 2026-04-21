@@ -186,9 +186,12 @@ def chat():
         return jsonify({"error": "message is required"}), 400
 
     try:
+        app.logger.info(f"Processing chat message: {message[:50]}...")
         answer = get_answer(message)
+        app.logger.info(f"Chat response generated successfully")
     except Exception as exc:
-        return jsonify({"error": f"Chat service error: {exc}"}), 500
+        app.logger.error(f"Chat service error: {exc}", exc_info=True)
+        return jsonify({"error": f"Chat service error: {str(exc)[:100]}"}), 500
 
     return jsonify({"answer": answer})
 
