@@ -13,7 +13,7 @@ import fitz
 import numpy as np
 
 from rag_components import (
-    SemanticEmbedder,
+    LightweightEmbedder,
     IntelligentChunker,
     FAISSIndexManager,
     CrossEncoderReRanker,
@@ -39,7 +39,7 @@ DEFAULT_TOP_K = 4
 DEFAULT_CONFIG = RAGConfig()
 
 # Global instances (cached)
-_embedder: Optional[SemanticEmbedder] = None
+_embedder: Optional[LightweightEmbedder] = None
 _chunker: Optional[IntelligentChunker] = None
 _index_manager: Optional[FAISSIndexManager] = None
 _reranker: Optional[CrossEncoderReRanker] = None
@@ -67,13 +67,13 @@ def get_config() -> RAGConfig:
     return _config
 
 
-def get_embedder() -> SemanticEmbedder:
+def get_embedder() -> LightweightEmbedder:
     """Get semantic embedder instance (cached)."""
     global _embedder
     
     if _embedder is None:
         config = get_config()
-        _embedder = SemanticEmbedder(config.embedding_model)
+        _embedder = LightweightEmbedder(config.embedding_model)
     
     return _embedder
 

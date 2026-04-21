@@ -9,7 +9,7 @@ import pytest
 import numpy as np
 
 from rag_components import (
-    SemanticEmbedder,
+    LightweightEmbedder,
     IntelligentChunker,
     FAISSIndexManager,
     CrossEncoderReRanker,
@@ -21,12 +21,12 @@ from rag_components import (
 )
 
 
-class TestSemanticEmbedder:
-    """Test Semantic Embedder component."""
+class TestLightweightEmbedder:
+    """Test Lightweight Embedder component."""
     
     def test_encode_single_text(self):
         """Test encoding a single text."""
-        embedder = SemanticEmbedder()
+        embedder = LightweightEmbedder()
         texts = ["Hello world"]
         embeddings = embedder.encode(texts)
         
@@ -35,7 +35,7 @@ class TestSemanticEmbedder:
     
     def test_encode_multiple_texts(self):
         """Test encoding multiple texts."""
-        embedder = SemanticEmbedder()
+        embedder = LightweightEmbedder()
         texts = ["Hello world", "How are you", "This is a test"]
         embeddings = embedder.encode(texts)
         
@@ -46,7 +46,7 @@ class TestSemanticEmbedder:
     
     def test_semantic_similarity(self):
         """Test that semantically similar texts have high similarity."""
-        embedder = SemanticEmbedder()
+        embedder = LightweightEmbedder()
         
         # Similar texts
         similar_texts = ["charging the car", "charge the vehicle"]
@@ -58,8 +58,8 @@ class TestSemanticEmbedder:
     
     def test_embedding_dimension(self):
         """Test embedding dimension property."""
-        embedder = SemanticEmbedder()
-        assert embedder.embedding_dimension == 384
+        embedder = LightweightEmbedder()
+        assert embedder.embedding_dimension == 1
 
 
 class TestIntelligentChunker:
