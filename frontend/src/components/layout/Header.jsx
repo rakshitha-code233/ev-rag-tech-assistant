@@ -28,14 +28,14 @@ function SettingsModal({ onClose }) {
             </div>
             <button
               onClick={toggleTheme}
-              className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${
+              className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
                 theme === 'dark' ? 'bg-blue-600' : 'bg-slate-600'
               }`}
               aria-label="Toggle theme"
             >
               <span
-                className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                  theme === 'dark' ? 'translate-x-6' : 'translate-x-0.5'
+                className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
+                  theme === 'dark' ? 'translate-x-6' : 'translate-x-0'
                 }`}
               />
             </button>
