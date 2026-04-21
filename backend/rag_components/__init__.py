@@ -1,4 +1,4 @@
-"""RAG Components - Improved RAG system with semantic embeddings and re-ranking."""
+"""RAG Components - Improved RAG system with lightweight BM25 retrieval."""
 
 from .models import (
     RetrievedChunk,
@@ -6,7 +6,7 @@ from .models import (
     IndexMetadata,
     RAGConfig,
 )
-from .embedder import SemanticEmbedder
+from .embedder import LightweightEmbedder
 from .chunker import IntelligentChunker
 from .index_manager import FAISSIndexManager
 from .reranker import CrossEncoderReRanker
@@ -19,7 +19,7 @@ __all__ = [
     "ChunkMetadata",
     "IndexMetadata",
     "RAGConfig",
-    "SemanticEmbedder",
+    "LightweightEmbedder",
     "IntelligentChunker",
     "FAISSIndexManager",
     "CrossEncoderReRanker",
