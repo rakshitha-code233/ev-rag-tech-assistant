@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. Write bug condition exploration test
+- [x] 1. Write bug condition exploration test
   - **Property 1: Bug Condition** - Upload and Delete Failures
   - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bugs exist
   - **DO NOT attempt to fix the test or the code when it fails**
@@ -21,7 +21,7 @@
   - Mark task complete when test is written, run, and failures are documented
   - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 2. Write preservation property tests (BEFORE implementing fix)
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
   - **Property 2: Preservation** - Non-Upload/Delete API Requests
   - **IMPORTANT**: Follow observation-first methodology
   - Observe behavior on UNFIXED code for non-upload/delete requests:
@@ -41,9 +41,9 @@
   - Mark task complete when tests are written, run, and passing on unfixed code
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 3. Fix manual upload and delete bugs
+- [x] 3. Fix manual upload and delete bugs
 
-  - [ ] 3.1 Fix uploadManual function in frontend/src/services/manualService.js
+  - [x] 3.1 Fix uploadManual function in frontend/src/services/manualService.js
     - Remove explicit `headers: { 'Content-Type': 'multipart/form-data' }` line from api.post() call
     - Allow browser to automatically set Content-Type with boundary parameter for FormData payloads
     - Preserve onUploadProgress callback for progress tracking
@@ -52,7 +52,7 @@
     - _Preservation: All non-upload API requests continue to use Content-Type: application/json_
     - _Requirements: 1.1, 2.1, 2.3, 3.1, 3.2, 3.3, 3.4_
 
-  - [ ] 3.2 Fix deleteManual function in frontend/src/services/manualService.js
+  - [x] 3.2 Fix deleteManual function in frontend/src/services/manualService.js
     - Remove encodeURIComponent() call from URL construction
     - Change from `/api/manuals/${encodeURIComponent(filename)}` to `/api/manuals/${filename}`
     - Allow axios to handle URL encoding at HTTP transport level
@@ -62,7 +62,7 @@
     - _Preservation: All non-delete API requests continue to work unchanged_
     - _Requirements: 1.2, 1.3, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4_
 
-  - [ ] 3.3 Verify bug condition exploration test now passes
+  - [x] 3.3 Verify bug condition exploration test now passes
     - **Property 1: Expected Behavior** - Upload and Delete Success
     - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
     - The test from task 1 encodes the expected behavior
@@ -75,7 +75,7 @@
     - **EXPECTED OUTCOME**: Test PASSES (confirms bugs are fixed)
     - _Requirements: 2.1, 2.2, 2.3_
 
-  - [ ] 3.4 Verify preservation tests still pass
+  - [x] 3.4 Verify preservation tests still pass
     - **Property 2: Preservation** - Non-Upload/Delete API Requests
     - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
     - Run preservation property tests from step 2
@@ -85,7 +85,7 @@
     - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
     - Confirm all tests still pass after fix (no regressions)
 
-- [ ] 4. Checkpoint - Ensure all tests pass
+- [x] 4. Checkpoint - Ensure all tests pass
   - Run all tests (bug condition + preservation)
   - Verify upload works with simple filenames, spaces, and special characters
   - Verify delete works with simple filenames, spaces, and special characters
