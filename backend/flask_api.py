@@ -265,6 +265,18 @@ def upload_manual():
     if not uploaded.filename or not uploaded.filename.lower().endswith(".pdf"):
         return jsonify({"error": "Only PDF files are supported"}), 400
 
+    # Validate that it's an EV manual by checking filename
+    filename_lower = uploaded.filename.lower()
+    ev_keywords = ["tesla", "ev", "electric", "vehicle", "model", "charging", "battery", "diagnostic"]
+    
+    is_ev_manual = any(keyword in filename_lower for keyword in ev_keywords)
+    
+    if not is_ev_manual:
+        return jsonify({
+            "error": "Only EV repair manuals are supported. "
+            "Please upload manuals related to electric vehicles (e.g., Tesla_Model3.pdf, EV_Diagnostic_Manual.pdf)"
+        }), 400
+
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     dest = DATA_DIR / uploaded.filename
 
