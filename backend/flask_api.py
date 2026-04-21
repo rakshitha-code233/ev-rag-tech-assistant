@@ -32,20 +32,23 @@ _cors_origins = [
     "http://127.0.0.1:5173",
     "https://ev-rag-tech-assistant.vercel.app",
     "https://ev-rag-tech-assistant-frontend.vercel.app",
-    # Allow all Vercel preview URLs (*.vercel.app)
-    "https://*.vercel.app",
 ]
 if FRONTEND_URL and FRONTEND_URL not in _cors_origins:
     _cors_origins.append(FRONTEND_URL)
 
 app = Flask(__name__)
+
+# Use regex pattern for Vercel preview URLs
 CORS(
     app,
     origins=_cors_origins,
-    allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
-    expose_headers=["Content-Type"],
-    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    supports_credentials=False,
+    resources={r"/api/*": {
+        "origins": _cors_origins + [r"https://.*\.vercel\.app"],
+        "allow_headers": ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
+        "expose_headers": ["Content-Type"],
+        "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        "supports_credentials": False,
+    }}
 )
 
 BASE_DIR = Path(__file__).resolve().parent
