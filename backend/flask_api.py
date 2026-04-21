@@ -37,23 +37,10 @@ if FRONTEND_URL and FRONTEND_URL not in _cors_origins:
 
 app = Flask(__name__)
 
-# Custom CORS handler to allow all Vercel preview URLs
-@app.after_request
-def after_request(response):
-    origin = request.headers.get('Origin')
-    if origin:
-        # Allow all Vercel preview URLs and known origins
-        if origin.endswith('.vercel.app') or origin in _cors_origins:
-            response.headers['Access-Control-Allow-Origin'] = origin
-            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
-            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Accept, Origin, X-Requested-With'
-            response.headers['Access-Control-Expose-Headers'] = 'Content-Type'
-    return response
-
-# Also apply standard CORS for known origins
+# Simple CORS configuration - allow all origins for now to debug
 CORS(
     app,
-    origins=_cors_origins,
+    origins="*",
     allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
     expose_headers=["Content-Type"],
     methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
