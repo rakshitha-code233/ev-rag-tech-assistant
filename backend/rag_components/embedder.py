@@ -1,65 +1,30 @@
-"""Semantic Embedder using sentence-transformers for RAG system."""
+"""Lightweight Embedder using BM25 for RAG system - no heavy ML models."""
 
 import logging
 from typing import List, Optional
 import numpy as np
+from rank_bm25 import BM25Okapi
 
 logger = logging.getLogger(__name__)
 
-# Global model cache to prevent reloading
-_model_cache = {}
 
-
-class SemanticEmbedder:
-    """Wrapper for sentence-transformers embedding model.
+class LightweightEmbedder:
+    """Lightweight embedder using BM25 algorithm.
     
-    Provides semantic embeddings using transformer-based models.
-    Replaces the hash-based LocalHashingEmbedder with semantic understanding.
+    Provides fast, memory-efficient text retrieval without loading
+    large transformer models. Uses rank-bm25 which is already in requirements.
     """
     
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
-        """Initialize the embedding model.
+    def __init__(self, model_name: str = "bm25"):
+        """Initialize the lightweight embedder.
         
         Args:
-            model_name: HuggingFace model identifier
-                Default: "all-MiniLM-L6-v2" (384 dimensions, fast inference)
+            model_name: Embedder type (currently only 'bm25' supported)
         """
         self.model_name = model_name
-        self.dimension = 384  # for MiniLM-L6-v2
-        self._model = None
-    
-    def _load_model(self):
-        """Lazy-load the model on first use.
-        
-        Uses global cache to prevent reloading the model across multiple
-        instances or queries in the same session.
-        """
-        global _model_cache
-        
-        if self.model_name in _model_cache:
-            self._model = _model_cache[self.model_name]
-            logger.debug(f"Using cached model: {self.model_name}")
-            return
-        
-        try:
-            from sentence_transformers import SentenceTransformer
-            
-            logger.info(f"Loading embedding model: {self.model_name}")
-            self._model = SentenceTransformer(self.model_name)
-            
-            # Update dimension based on actual model
-            self.dimension = self._model.get_sentence_embedding_dimension()
-            
-            # Cache the model globally
-            _model_cache[self.model_name] = self._model
-            logger.info(f"Model loaded successfully. Dimension: {self.dimension}")
-            
-        except ImportError:
-            logger.error("sentence-transformers not installed. Install with: pip install sentence-transformers")
-            raise
-        except Exception as e:
-            logger.error(f"Failed to load embedding model {self.model_name}: {e}")
-            raise
+        self.dimension = 1  # BM25 returns scalar scores
+        self.corpus = []
+        self.bm25 = None
     
     def encode(
         self,
@@ -68,82 +33,89 @@ class SemanticEmbedder:
         normalize_embeddings: bool = True,
         show_progress_bar: bool = False,
     ) -> np.ndarray:
-        """Encode texts into semantic embeddings.
+        """Encode texts using BM25.
+        
+        For BM25, we tokenize and store the corpus for later retrieval.
+        Returns a simple representation.
         
         Args:
             texts: List of text strings to encode
-            convert_to_numpy: Return numpy array (vs list)
-            normalize_embeddings: L2 normalize for cosine similarity
-            show_progress_bar: Show encoding progress
+            convert_to_numpy: Return numpy array
+            normalize_embeddings: Normalize scores
+            show_progress_bar: Ignored (no progress for BM25)
             
         Returns:
-            Normalized embeddings as numpy array (N, dimension)
-            
-        Raises:
-            ValueError: If texts is empty or invalid
-            RuntimeError: If model fails to encode
+            Dummy embeddings (BM25 is used for retrieval, not encoding)
         """
         if not texts:
             raise ValueError("texts cannot be empty")
         
-        if self._model is None:
-            self._load_model()
-        
         try:
-            # Encode texts using the model
-            embeddings = self._model.encode(
-                texts,
-                convert_to_numpy=convert_to_numpy,
-                normalize_embeddings=normalize_embeddings,
-                show_progress_bar=show_progress_bar,
-            )
+            # Tokenize corpus for BM25
+            tokenized_corpus = [text.lower().split() for text in texts]
+            self.bm25 = BM25Okapi(tokenized_corpus)
+            self.corpus = texts
             
-            # Ensure output is numpy array
-            if not isinstance(embeddings, np.ndarray):
-                embeddings = np.array(embeddings)
+            logger.info(f"BM25 index built for {len(texts)} documents")
             
-            # Verify normalization if requested
-            if normalize_embeddings:
-                norms = np.linalg.norm(embeddings, axis=1)
-                if not np.allclose(norms, 1.0, atol=1e-6):
-                    logger.warning("Embeddings not properly normalized. Re-normalizing...")
-                    embeddings = embeddings / norms[:, np.newaxis]
-            
+            # Return dummy embeddings (BM25 doesn't use embeddings)
+            embeddings = np.ones((len(texts), 1), dtype=np.float32)
             return embeddings
             
         except Exception as e:
-            logger.error(f"Failed to encode texts: {e}")
-            raise RuntimeError(f"Embedding encoding failed: {e}") from e
+            logger.error(f"Failed to build BM25 index: {e}")
+            raise RuntimeError(f"BM25 indexing failed: {e}") from e
+    
+    def search(self, query: str, top_k: int = 10) -> List[tuple]:
+        """Search using BM25.
+        
+        Args:
+            query: Query string
+            top_k: Number of top results to return
+            
+        Returns:
+            List of (score, index) tuples
+        """
+        if self.bm25 is None:
+            raise RuntimeError("BM25 index not built. Call encode() first.")
+        
+        try:
+            query_tokens = query.lower().split()
+            scores = self.bm25.get_scores(query_tokens)
+            
+            # Get top-k indices
+            top_indices = np.argsort(scores)[::-1][:top_k]
+            results = [(scores[idx], idx) for idx in top_indices if scores[idx] > 0]
+            
+            return results
+            
+        except Exception as e:
+            logger.error(f"BM25 search failed: {e}")
+            raise RuntimeError(f"BM25 search failed: {e}") from e
     
     @property
     def embedding_dimension(self) -> int:
-        """Return the embedding dimension for this model.
+        """Return the embedding dimension.
         
         Returns:
-            Embedding dimension (e.g., 384 for MiniLM-L6-v2)
+            1 (BM25 returns scalar scores)
         """
-        if self._model is None:
-            self._load_model()
         return self.dimension
     
     def clear_cache(self):
-        """Clear the global model cache.
-        
-        Useful for testing or when switching models.
-        """
-        global _model_cache
-        _model_cache.clear()
-        self._model = None
-        logger.info("Model cache cleared")
+        """Clear the BM25 index."""
+        self.bm25 = None
+        self.corpus = []
+        logger.info("BM25 index cleared")
 
 
-def get_embedder(model_name: str = "all-MiniLM-L6-v2") -> SemanticEmbedder:
-    """Factory function to get a SemanticEmbedder instance.
+def get_embedder(model_name: str = "bm25") -> LightweightEmbedder:
+    """Factory function to get a LightweightEmbedder instance.
     
     Args:
-        model_name: HuggingFace model identifier
+        model_name: Embedder type (currently only 'bm25')
         
     Returns:
-        SemanticEmbedder instance
+        LightweightEmbedder instance
     """
-    return SemanticEmbedder(model_name)
+    return LightweightEmbedder(model_name)
