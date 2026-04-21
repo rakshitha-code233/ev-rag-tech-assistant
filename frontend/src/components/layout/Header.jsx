@@ -10,32 +10,32 @@ function SettingsModal({ onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onClose}>
       <div
-        className="w-80 rounded-2xl border border-blue-900/30 shadow-xl p-6"
+        className="w-96 rounded-2xl border border-blue-900/30 shadow-xl p-6"
         style={{ backgroundColor: '#0d1117' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-white font-semibold text-base">Settings</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors flex-shrink-0">
             <X size={18} />
           </button>
         </div>
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-blue-900/20">
-            <div>
+          <div className="flex items-center justify-between py-3 border-b border-blue-900/20 gap-4">
+            <div className="flex-1 min-w-0">
               <p className="text-white text-sm font-medium">Dark Mode</p>
               <p className="text-slate-500 text-xs mt-0.5">Toggle light / dark theme</p>
             </div>
             <button
               onClick={toggleTheme}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
+              className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${
                 theme === 'dark' ? 'bg-blue-600' : 'bg-slate-600'
               }`}
               aria-label="Toggle theme"
             >
               <span
                 className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                  theme === 'dark' ? 'translate-x-7' : 'translate-x-1'
+                  theme === 'dark' ? 'translate-x-6' : 'translate-x-0.5'
                 }`}
               />
             </button>
