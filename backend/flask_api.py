@@ -26,7 +26,6 @@ from rag_improved import DATA_DIR, build_manual_index, list_manual_files
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 
-# Allow all Vercel preview URLs and production URLs
 _cors_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -38,17 +37,27 @@ if FRONTEND_URL and FRONTEND_URL not in _cors_origins:
 
 app = Flask(__name__)
 
-# Use regex pattern for Vercel preview URLs
+# Custom CORS handler to allow all Vercel preview URLs
+@app.after_request
+def after_request(response):
+    origin = request.headers.get('Origin')
+    if origin:
+        # Allow all Vercel preview URLs and known origins
+        if origin.endswith('.vercel.app') or origin in _cors_origins:
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Accept, Origin, X-Requested-With'
+            response.headers['Access-Control-Expose-Headers'] = 'Content-Type'
+    return response
+
+# Also apply standard CORS for known origins
 CORS(
     app,
     origins=_cors_origins,
-    resources={r"/api/*": {
-        "origins": _cors_origins + [r"https://.*\.vercel\.app"],
-        "allow_headers": ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
-        "expose_headers": ["Content-Type"],
-        "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        "supports_credentials": False,
-    }}
+    allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
+    expose_headers=["Content-Type"],
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    supports_credentials=False,
 )
 
 BASE_DIR = Path(__file__).resolve().parent
