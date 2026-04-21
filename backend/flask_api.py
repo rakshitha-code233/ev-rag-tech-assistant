@@ -469,18 +469,10 @@ def health():
 init_db()
 init_chat_history_table()
 
-# Always rebuild RAG index on startup to ensure compatibility with current faiss/numpy versions
-try:
-    from rag_improved import list_manual_files, build_manual_index
-    manuals = list_manual_files()
-    if manuals:
-        app.logger.info("Rebuilding RAG index from %d manuals on startup", len(manuals))
-        result = build_manual_index()
-        app.logger.info("RAG index built: %s", result)
-    else:
-        app.logger.warning("No manuals found in DATA_DIR on startup")
-except Exception as e:
-    app.logger.warning("RAG index build failed on startup: %s", e)
+# Skip RAG index rebuild on startup to avoid memory issues on deployment
+# Index will be rebuilt automatically when manuals are uploaded/deleted
+# Existing index in rag_store/ will be used for chat queries
+app.logger.info("Flask API initialized. RAG index will be built on first manual upload/delete.")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
