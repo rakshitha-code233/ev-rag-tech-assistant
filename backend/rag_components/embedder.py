@@ -41,7 +41,7 @@ class LightweightEmbedder:
         Args:
             texts: List of text strings to encode
             convert_to_numpy: Return numpy array
-            normalize_embeddings: Normalize scores
+            normalize_embeddings: Ignored (BM25 doesn't use embeddings)
             show_progress_bar: Ignored (no progress for BM25)
             
         Returns:
@@ -59,6 +59,7 @@ class LightweightEmbedder:
             logger.info(f"BM25 index built for {len(texts)} documents")
             
             # Return dummy embeddings (BM25 doesn't use embeddings)
+            # Return ones with shape (N, 1) for compatibility
             embeddings = np.ones((len(texts), 1), dtype=np.float32)
             return embeddings
             

@@ -5,7 +5,9 @@ adds intelligent chunking, cross-encoder re-ranking, and improved citation track
 It maintains backward compatibility with the existing API.
 """
 
+import json
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -178,7 +180,7 @@ def extract_chunks_from_pdf(pdf_path: Path) -> List[Dict[str, object]]:
 
 
 def build_manual_index() -> Dict[str, object]:
-    """Build manual index with semantic embeddings.
+    """Build manual index with BM25 retrieval.
     
     Returns:
         Dictionary with keys: manuals_indexed, chunks_indexed
@@ -205,24 +207,36 @@ def build_manual_index() -> Dict[str, object]:
             METADATA_FILE.unlink()
         return {"manuals_indexed": 0, "chunks_indexed": 0}
     
-    # Embed chunks using semantic embedder
-    logger.info(f"Embedding {len(all_chunks)} chunks...")
-    embedder = get_embedder()
-    texts = [chunk["text"] for chunk in all_chunks]
-    embeddings = embedder.encode(texts, normalize_embeddings=True)
-    embeddings = embeddings.astype("float32")
+    # For BM25, we don't need to create embeddings
+    # Just save the chunks and metadata
+    logger.info(f"Saving {len(all_chunks)} chunks to metadata...")
     
-    # Build and save index
-    logger.info("Building FAISS index...")
-    index_manager = get_index_manager()
-    stats = index_manager.build_index(all_chunks, embeddings)
+    # Create metadata
+    metadata = {
+        "embedding_dimension": 1,  # BM25 doesn't use embeddings
+        "model_name": "bm25",
+        "created_at": datetime.utcnow().isoformat(),
+        "chunks": all_chunks,
+    }
     
-    logger.info(f"Index built successfully: {stats}")
-    return stats
+    # Save metadata
+    METADATA_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(METADATA_FILE, "w") as f:
+        json.dump(metadata, f, indent=2)
+    
+    logger.info(f"Index metadata saved to {METADATA_FILE}")
+    
+    # Count unique manuals
+    unique_manuals = set(chunk["manual"] for chunk in all_chunks)
+    
+    return {
+        "manuals_indexed": len(unique_manuals),
+        "chunks_indexed": len(all_chunks),
+    }
 
 
 def retrieve_manual_chunks(query: str, top_k: Optional[int] = None) -> List[RetrievedChunk]:
-    """Retrieve relevant chunks from manual index.
+    """Retrieve relevant chunks from manual index using BM25.
     
     Args:
         query: User query string
@@ -239,7 +253,7 @@ def retrieve_manual_chunks(query: str, top_k: Optional[int] = None) -> List[Retr
     if top_k is None:
         top_k = config.top_k
     
-    # Load index
+    # Load metadata to get chunks
     index_manager = get_index_manager()
     index_data = index_manager.load_index()
     
@@ -247,16 +261,7 @@ def retrieve_manual_chunks(query: str, top_k: Optional[int] = None) -> List[Retr
         logger.warning("No manual index available")
         return []
     
-    # Embed query
-    embedder = get_embedder()
-    query_embedding = embedder.encode([query], normalize_embeddings=True)
-    query_embedding = query_embedding.astype("float32")
-    
-    # Search index
-    distances, indices = index_manager.search(query_embedding, top_k)
-    
-    # Build retrieved chunks
-    retrieved: List[RetrievedChunk] = []
+    # Get metadata
     metadata_dict = index_data["metadata"]
     
     # Handle both old format (list) and new format (dict with "chunks" key)
@@ -265,7 +270,33 @@ def retrieve_manual_chunks(query: str, top_k: Optional[int] = None) -> List[Retr
     else:
         metadata = metadata_dict
     
-    for score, idx in zip(distances[0], indices[0]):
+    if not metadata:
+        logger.warning("No chunks in metadata")
+        return []
+    
+    # Use BM25 for retrieval
+    embedder = get_embedder()
+    
+    # Build BM25 index from chunks if not already built
+    if embedder.bm25 is None:
+        texts = [item["text"] for item in metadata]
+        try:
+            embedder.encode(texts)  # This builds the BM25 index
+        except Exception as e:
+            logger.error(f"Failed to build BM25 index: {e}")
+            return []
+    
+    # Search using BM25
+    try:
+        results = embedder.search(query, top_k=top_k)
+    except Exception as e:
+        logger.error(f"BM25 search failed: {e}")
+        return []
+    
+    # Build retrieved chunks from BM25 results
+    retrieved: List[RetrievedChunk] = []
+    
+    for score, idx in results:
         if idx < 0 or idx >= len(metadata):
             continue
         
@@ -281,12 +312,6 @@ def retrieve_manual_chunks(query: str, top_k: Optional[int] = None) -> List[Retr
             score=float(score),
         )
         retrieved.append(chunk)
-    
-    # Re-rank chunks if enabled
-    if config.reranking_enabled and retrieved:
-        logger.debug(f"Re-ranking {len(retrieved)} chunks...")
-        reranker = get_reranker()
-        retrieved = reranker.rerank(query, retrieved)
     
     logger.debug(f"Retrieved {len(retrieved)} chunks for query: {query[:50]}...")
     return retrieved

@@ -175,7 +175,7 @@ export default function UploadPage() {
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-200 mb-6 ${
+            className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-200 mb-6 ${
               isDragActive
                 ? 'border-blue-500 bg-blue-500/10'
                 : 'border-blue-900/40 hover:border-blue-700/60 hover:bg-blue-500/5'
@@ -202,7 +202,7 @@ export default function UploadPage() {
               </div>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="btn-primary flex items-center gap-2"
+                className="btn-primary flex items-center gap-2 px-4 py-2 whitespace-nowrap"
               >
                 <FileText size={16} />
                 Choose PDF Files
