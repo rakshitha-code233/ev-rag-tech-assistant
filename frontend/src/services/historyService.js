@@ -43,3 +43,24 @@ export async function updateConversation(id, messages) {
   const response = await api.put(`/api/history/${id}`, { messages })
   return response.data
 }
+
+/**
+ * Rename a conversation.
+ * @param {number} id - Conversation ID
+ * @param {string} title - New title
+ * @returns {Promise<{id: number, title: string}>}
+ */
+export async function renameConversation(id, title) {
+  const response = await api.patch(`/api/history/${id}`, { title })
+  return response.data
+}
+
+/**
+ * Delete a conversation.
+ * @param {number} id - Conversation ID
+ * @returns {Promise<{message: string}>}
+ */
+export async function deleteConversation(id) {
+  const response = await api.delete(`/api/history/${id}`)
+  return response.data
+}

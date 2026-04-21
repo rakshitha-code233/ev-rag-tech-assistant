@@ -10,6 +10,9 @@ import { saveConversation, getConversation, updateConversation } from '../servic
 import api from '../services/api'
 import { Bot } from 'lucide-react'
 
+// Global abort controller for managing pending requests
+let globalAbortController = null
+
 function EmptyState({ onSuggestion }) {
   return (
     <div className="flex flex-col items-center justify-center h-full text-center px-4">
@@ -59,6 +62,15 @@ export default function ChatPage() {
     }).catch(() => {})
   }, [])
 
+  // Cleanup: abort pending requests on unmount
+  useEffect(() => {
+    return () => {
+      if (globalAbortController) {
+        globalAbortController.abort()
+      }
+    }
+  }, [])
+
   // Load existing conversation when id param is present
   useEffect(() => {
     if (!id) {
@@ -93,35 +105,50 @@ export default function ChatPage() {
       timestamp: new Date().toISOString(),
     }
 
-    setMessages((prev) => [...prev, userMessage])
+    // Update messages state with user message
+    const messagesWithUser = [...messages, userMessage]
+    setMessages(messagesWithUser)
     setIsLoading(true)
     setChatError('')
 
+    // Create abort controller for this request
+    globalAbortController = new AbortController()
+
     try {
-      const data = await sendMessage(text)
+      const title = text.slice(0, 80)
+      let convId = conversationId
+
+      // OPTIMISTIC PERSISTENCE: Save user message immediately (don't wait for response)
+      if (!convId) {
+        // New conversation: save with just the user message
+        const res = await saveConversation(title, messagesWithUser)
+        convId = res.id
+        setConversationId(res.id)
+      } else {
+        // Existing conversation: update with new message
+        await updateConversation(convId, messagesWithUser)
+      }
+
+      // Now send message to assistant
+      const data = await sendMessage(text, globalAbortController.signal)
       const assistantMessage = {
         role: 'assistant',
         content: data.answer,
         timestamp: new Date().toISOString(),
       }
 
-      setMessages((prev) => {
-        const updated = [...prev, assistantMessage]
-        // Save or update history (best-effort)
-        const title = text.slice(0, 80)
-        if (conversationId) {
-          updateConversation(conversationId, updated).catch(() => {})
-        } else {
-          saveConversation(title, updated)
-            .then((res) => setConversationId(res.id))
-            .catch(() => {})
-        }
-        return updated
-      })
+      // Append response to persisted conversation
+      const messagesWithResponse = [...messagesWithUser, assistantMessage]
+      setMessages(messagesWithResponse)
+      await updateConversation(convId, messagesWithResponse).catch(() => {})
     } catch (err) {
-      setChatError('Unable to get a response. Please try again.')
+      // Don't show error if request was aborted (component unmounted)
+      if (err.name !== 'AbortError') {
+        setChatError('Unable to get a response. Please try again.')
+      }
     } finally {
       setIsLoading(false)
+      globalAbortController = null
     }
   }
 

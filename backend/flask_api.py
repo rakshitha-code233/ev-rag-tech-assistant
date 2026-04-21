@@ -40,7 +40,7 @@ CORS(
     origins=_cors_origins,
     allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
     expose_headers=["Content-Type"],
-    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     supports_credentials=False,
 )
 
@@ -385,6 +385,46 @@ def update_conversation(conversation_id: int):
     if result.rowcount == 0:
         return jsonify({"error": "Conversation not found"}), 404
     return jsonify({"id": conversation_id})
+
+
+@app.route("/api/history/<int:conversation_id>", methods=["PATCH"])
+@require_auth
+def rename_conversation(conversation_id: int):
+    user_id = request.current_user["sub"]
+    data = request.get_json(silent=True) or {}
+    title = (data.get("title") or "").strip()
+
+    if not title:
+        return jsonify({"error": "title is required"}), 400
+
+    conn = get_db()
+    result = conn.execute(
+        "UPDATE chat_history SET title=? WHERE id=? AND user_id=?",
+        (title[:80], conversation_id, user_id),
+    )
+    conn.commit()
+    conn.close()
+
+    if result.rowcount == 0:
+        return jsonify({"error": "Conversation not found"}), 404
+    return jsonify({"id": conversation_id, "title": title[:80]})
+
+
+@app.route("/api/history/<int:conversation_id>", methods=["DELETE"])
+@require_auth
+def delete_conversation(conversation_id: int):
+    user_id = request.current_user["sub"]
+    conn = get_db()
+    result = conn.execute(
+        "DELETE FROM chat_history WHERE id=? AND user_id=?",
+        (conversation_id, user_id),
+    )
+    conn.commit()
+    conn.close()
+
+    if result.rowcount == 0:
+        return jsonify({"error": "Conversation not found"}), 404
+    return jsonify({"message": "Conversation deleted successfully"})
 
 
 @app.route("/api/history", methods=["POST"])
