@@ -5,7 +5,7 @@ from typing import List
 from dotenv import load_dotenv
 from groq import Groq
 
-from rag import format_citations, format_context, retrieve_manual_chunks
+from rag_improved import retrieve_manual_chunks, format_citations, format_context
 
 
 load_dotenv()
@@ -56,33 +56,23 @@ def extract_keywords(text: str) -> set[str]:
 
 
 def select_relevant_chunks(query: str):
+    """Select relevant chunks based on semantic similarity scores.
+    
+    Since we're using semantic embeddings, we can trust the scores directly
+    without needing keyword overlap validation.
+    """
     relevant_chunks = []
-    query_terms = extract_keywords(query)
-    is_definition_query = bool(re.match(r"^\s*what\s+(is|are)\b", query.lower()))
-
-    for chunk in retrieve_manual_chunks(query):
-        chunk_terms = extract_keywords(chunk.text)
-        overlap = query_terms & chunk_terms
-
-        if not query_terms:
-            continue
-
-        if is_definition_query and chunk.score < 0.45:
-            continue
-
-        if len(overlap) >= 2:
+    
+    # Get chunks from semantic retrieval (already ranked by score)
+    chunks = retrieve_manual_chunks(query, top_k=10)
+    
+    # Filter by score threshold (0.3 is reasonable for semantic embeddings)
+    score_threshold = 0.30
+    
+    for chunk in chunks:
+        if chunk.score >= score_threshold:
             relevant_chunks.append(chunk)
-            continue
-
-        # Single keyword match with decent score
-        if overlap and chunk.score >= 0.35:
-            relevant_chunks.append(chunk)
-            continue
-
-        # High score even without keyword overlap (hash embedder can still find relevant chunks)
-        if chunk.score >= 0.50:
-            relevant_chunks.append(chunk)
-
+    
     return relevant_chunks
 
 
@@ -134,20 +124,36 @@ def get_groq_client() -> Groq | None:
 
 def build_manual_only_prompt(query: str, context: str) -> List[dict]:
     system_prompt = (
-        "You are an EV diagnostic assistant for service technicians. "
-        "Answer ONLY from the provided repair manual excerpts. "
-        "Use exact terminology from the manuals, not paraphrased versions. "
-        "Cite source numbers inline like [Source 1] when you reference information. "
-        "If the excerpts don't answer the question, say 'The provided manual excerpts do not contain information on...' "
-        "Format your response as:\n"
-        "ANSWER:\n[Your answer with inline citations like [Source 1]]\n\n"
-        "PROCEDURE:\n[Numbered steps if available, or 'None' if no steps in excerpts]\n\n"
-        "Do NOT add a separate Citations section - only use inline [Source N] citations."
+        "You are an expert Electric Vehicle (EV) diagnostic assistant. "
+        "Provide accurate, step-by-step diagnostic guidance using ONLY the provided manual context.\n\n"
+        "STRICT RULES:\n"
+        "1. Always base your answer ONLY on the given context.\n"
+        "2. Do NOT make up information or assumptions.\n"
+        "3. If the answer is not in the context, say: 'The provided manual does not contain enough information.'\n"
+        "4. Always respond in a structured diagnostic format.\n"
+        "5. Be clear, precise, and technical (like a professional mechanic).\n\n"
+        "OUTPUT FORMAT:\n"
+        "Problem:\n"
+        "- Clearly restate the user's issue\n\n"
+        "Possible Causes:\n"
+        "- List all possible causes based on the manual\n\n"
+        "Diagnostic Steps:\n"
+        "1. Step-by-step troubleshooting process\n"
+        "2. Each step must be actionable\n\n"
+        "Solution:\n"
+        "- Final recommended fix or action\n\n"
+        "Source:\n"
+        "- Mention the section or page from the manual (if available)\n\n"
+        "TONE:\n"
+        "- Professional\n"
+        "- Concise\n"
+        "- Technical (avoid casual language)\n\n"
+        "Use inline citations [Source N] for each fact from the manual."
     )
     user_prompt = (
         f"Question: {query}\n\n"
         f"Manual excerpts:\n{context}\n\n"
-        "Respond in the exact format specified above."
+        "Provide a diagnostic response following the structured format above."
     )
     return [
         {"role": "system", "content": system_prompt},
@@ -210,6 +216,10 @@ def get_answer(query: str) -> str:
         source_num = int(match.group(1))
         if 1 <= source_num <= len(chunks):
             used_sources.add(source_num)
+    
+    # Clean up the answer: remove duplicate text and extra whitespace
+    answer = re.sub(r'\n\s*\n+', '\n\n', answer)  # Remove multiple blank lines
+    answer = re.sub(r'([.!?])\s+([A-Z])', r'\1\n\n\2', answer)  # Add line breaks between sentences
     
     # Build citations section with only used sources
     if used_sources:

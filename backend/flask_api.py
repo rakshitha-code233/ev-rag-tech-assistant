@@ -18,7 +18,7 @@ from flask_cors import CORS
 
 from db import init_db, login_user, register_user
 from manual_query import get_answer
-from rag import DATA_DIR, build_manual_index, list_manual_files
+from rag_improved import DATA_DIR, build_manual_index, list_manual_files
 
 # ---------------------------------------------------------------------------
 # App setup
@@ -40,7 +40,7 @@ CORS(
     origins=_cors_origins,
     allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
     expose_headers=["Content-Type"],
-    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     supports_credentials=False,
 )
 
@@ -49,7 +49,7 @@ USERS_DB = BASE_DIR / "users.db"
 
 JWT_SECRET = os.getenv("JWT_SECRET", "ev_diag_secret_change_in_production")
 JWT_ALGORITHM = "HS256"
-JWT_EXPIRY_HOURS = 24
+JWT_EXPIRY_HOURS = 24 * 30  # 30 days instead of 24 hours
 
 # ---------------------------------------------------------------------------
 # DB helpers
@@ -265,6 +265,18 @@ def upload_manual():
     if not uploaded.filename or not uploaded.filename.lower().endswith(".pdf"):
         return jsonify({"error": "Only PDF files are supported"}), 400
 
+    # Validate that it's an EV manual by checking filename
+    filename_lower = uploaded.filename.lower()
+    ev_keywords = ["tesla", "ev", "electric", "vehicle", "model", "charging", "battery", "diagnostic"]
+    
+    is_ev_manual = any(keyword in filename_lower for keyword in ev_keywords)
+    
+    if not is_ev_manual:
+        return jsonify({
+            "error": "Only EV repair manuals are supported. "
+            "Please upload manuals related to electric vehicles (e.g., Tesla_Model3.pdf, EV_Diagnostic_Manual.pdf)"
+        }), 400
+
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     dest = DATA_DIR / uploaded.filename
 
@@ -375,6 +387,46 @@ def update_conversation(conversation_id: int):
     return jsonify({"id": conversation_id})
 
 
+@app.route("/api/history/<int:conversation_id>", methods=["PATCH"])
+@require_auth
+def rename_conversation(conversation_id: int):
+    user_id = request.current_user["sub"]
+    data = request.get_json(silent=True) or {}
+    title = (data.get("title") or "").strip()
+
+    if not title:
+        return jsonify({"error": "title is required"}), 400
+
+    conn = get_db()
+    result = conn.execute(
+        "UPDATE chat_history SET title=? WHERE id=? AND user_id=?",
+        (title[:80], conversation_id, user_id),
+    )
+    conn.commit()
+    conn.close()
+
+    if result.rowcount == 0:
+        return jsonify({"error": "Conversation not found"}), 404
+    return jsonify({"id": conversation_id, "title": title[:80]})
+
+
+@app.route("/api/history/<int:conversation_id>", methods=["DELETE"])
+@require_auth
+def delete_conversation(conversation_id: int):
+    user_id = request.current_user["sub"]
+    conn = get_db()
+    result = conn.execute(
+        "DELETE FROM chat_history WHERE id=? AND user_id=?",
+        (conversation_id, user_id),
+    )
+    conn.commit()
+    conn.close()
+
+    if result.rowcount == 0:
+        return jsonify({"error": "Conversation not found"}), 404
+    return jsonify({"message": "Conversation deleted successfully"})
+
+
 @app.route("/api/history", methods=["POST"])
 @require_auth
 def save_history():
@@ -419,7 +471,7 @@ init_chat_history_table()
 
 # Always rebuild RAG index on startup to ensure compatibility with current faiss/numpy versions
 try:
-    from rag import list_manual_files, build_manual_index
+    from rag_improved import list_manual_files, build_manual_index
     manuals = list_manual_files()
     if manuals:
         app.logger.info("Rebuilding RAG index from %d manuals on startup", len(manuals))

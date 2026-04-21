@@ -1,0 +1,7 @@
+{
+  "specType": "bugfix",
+  "workflowType": "bugfix-workflow",
+  "featureName": "chat-message-persistence",
+  "createdAt": "2026-04-21T00:00:00Z",
+  "description": "Fix message loss when navigating away during response loading"
+}
