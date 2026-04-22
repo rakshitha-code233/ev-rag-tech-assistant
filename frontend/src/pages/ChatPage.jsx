@@ -58,8 +58,10 @@ export default function ChatPage() {
   // Check health endpoint for transcription availability
   useEffect(() => {
     api.get('/api/health').then((res) => {
-      setTranscriptionAvailable(res.data?.transcription_available ?? true)
-    }).catch(() => {})
+      setTranscriptionAvailable(res.data?.transcription_available ?? false)
+    }).catch(() => {
+      setTranscriptionAvailable(false)
+    })
   }, [])
 
   // Cleanup: abort pending requests on unmount
