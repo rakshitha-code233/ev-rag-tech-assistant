@@ -210,9 +210,8 @@ def chat():
 def transcribe():
     groq_key = os.getenv("GROQ_API_KEY")
     if not groq_key:
-        # Return 200 with empty transcript instead of 503
-        # This allows the frontend to gracefully handle missing transcription
-        return jsonify({"transcript": "", "error": "Transcription service not available. Please type your question instead."}), 200
+        app.logger.warning("GROQ_API_KEY not set")
+        return jsonify({"transcript": "", "error": "Transcription service not available"}), 200
 
     app.logger.info("transcribe: content_type=%r files=%r form=%r", 
                     request.content_type, list(request.files.keys()), list(request.form.keys()))
@@ -241,10 +240,11 @@ def transcribe():
             )
         Path(tmp_path).unlink(missing_ok=True)
         text = transcript.strip() if isinstance(transcript, str) else str(transcript).strip()
+        app.logger.info(f"Transcription successful: {text[:50]}")
         return jsonify({"transcript": text})
     except Exception as exc:
-        app.logger.error(f"Transcription error: {exc}")
-        return jsonify({"error": f"Transcription failed: {exc}"}), 503
+        app.logger.error(f"Transcription error: {exc}", exc_info=True)
+        return jsonify({"transcript": "", "error": f"Transcription failed: {str(exc)[:100]}"}), 200
 
 
 # ---------------------------------------------------------------------------
