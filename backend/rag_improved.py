@@ -11,8 +11,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import fitz
 import numpy as np
+from PyPDF2 import PdfReader
 
 from rag_components import (
     LightweightEmbedder,
@@ -156,10 +156,10 @@ def extract_chunks_from_pdf(pdf_path: Path) -> List[Dict[str, object]]:
     chunks: List[Dict[str, object]] = []
     
     try:
-        doc = fitz.open(pdf_path)
+        reader = PdfReader(pdf_path)
         
-        for page_number, page in enumerate(doc, start=1):
-            page_text = page.get_text("text")
+        for page_number, page in enumerate(reader.pages, start=1):
+            page_text = page.extract_text()
             
             # Extract chunks with metadata
             page_chunks = chunker.extract_chunks_from_page(
@@ -170,8 +170,6 @@ def extract_chunks_from_pdf(pdf_path: Path) -> List[Dict[str, object]]:
             )
             
             chunks.extend(page_chunks)
-        
-        doc.close()
         
     except Exception as e:
         logger.error(f"Failed to extract chunks from {pdf_path}: {e}")
