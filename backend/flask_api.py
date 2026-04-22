@@ -13,8 +13,12 @@ from functools import wraps
 from pathlib import Path
 
 import jwt
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+
+# Load environment variables from .env file
+load_dotenv()
 
 from db import init_db, login_user, register_user
 from manual_query import get_answer
@@ -210,14 +214,13 @@ def chat():
 def transcribe():
     groq_key = os.getenv("GROQ_API_KEY")
     if not groq_key:
-        app.logger.warning("GROQ_API_KEY not set")
-        return jsonify({"transcript": "", "error": "Transcription service not available"}), 200
+        app.logger.warning("GROQ_API_KEY environment variable not set")
+        return jsonify({"transcript": "", "error": "Transcription service not configured"}), 200
 
-    app.logger.info("transcribe: content_type=%r files=%r form=%r", 
-                    request.content_type, list(request.files.keys()), list(request.form.keys()))
+    app.logger.info(f"Transcription request received. API key present: {bool(groq_key)}")
 
     if "audio" not in request.files:
-        return jsonify({"error": f"audio file is required. Got files: {list(request.files.keys())}, content_type: {request.content_type}"}), 400
+        return jsonify({"error": f"audio file is required"}), 400
 
     audio_file = request.files["audio"]
     suffix = Path(audio_file.filename or "recording.webm").suffix or ".webm"
@@ -225,26 +228,35 @@ def transcribe():
     try:
         from groq import Groq
 
-        client = Groq(api_key=groq_key)
+        # Initialize Groq client with API key
+        client = Groq(api_key=groq_key.strip())
+        
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
             audio_file.save(tmp.name)
             tmp_path = tmp.name
 
-        with open(tmp_path, "rb") as handle:
-            transcript = client.audio.transcriptions.create(
-                model="whisper-large-v3-turbo",
-                file=handle,
-                language="en",
-                response_format="text",
-                temperature=0.0,
-            )
-        Path(tmp_path).unlink(missing_ok=True)
-        text = transcript.strip() if isinstance(transcript, str) else str(transcript).strip()
-        app.logger.info(f"Transcription successful: {text[:50]}")
-        return jsonify({"transcript": text})
+        try:
+            with open(tmp_path, "rb") as handle:
+                app.logger.info(f"Sending audio to Groq API (file size: {len(handle.read())} bytes)")
+                handle.seek(0)
+                transcript = client.audio.transcriptions.create(
+                    model="whisper-large-v3-turbo",
+                    file=handle,
+                    language="en",
+                    response_format="text",
+                    temperature=0.0,
+                )
+            
+            text = transcript.strip() if isinstance(transcript, str) else str(transcript).strip()
+            app.logger.info(f"Transcription successful: {text[:50]}")
+            return jsonify({"transcript": text})
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+            
     except Exception as exc:
-        app.logger.error(f"Transcription error: {exc}", exc_info=True)
-        return jsonify({"transcript": "", "error": f"Transcription failed: {str(exc)[:100]}"}), 200
+        error_msg = str(exc)
+        app.logger.error(f"Transcription failed: {error_msg}", exc_info=True)
+        return jsonify({"transcript": "", "error": f"Transcription failed: {error_msg[:100]}"}), 200
 
 
 # ---------------------------------------------------------------------------
