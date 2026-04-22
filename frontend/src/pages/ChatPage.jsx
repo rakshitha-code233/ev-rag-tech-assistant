@@ -57,8 +57,11 @@ export default function ChatPage() {
 
   // Check health endpoint for transcription availability
   useEffect(() => {
-    // Disable transcription by default - GROQ_API_KEY not configured on Render
-    setTranscriptionAvailable(false)
+    api.get('/api/health').then((res) => {
+      setTranscriptionAvailable(res.data?.transcription_available ?? true)
+    }).catch(() => {
+      setTranscriptionAvailable(true)
+    })
   }, [])
 
   // Cleanup: abort pending requests on unmount
