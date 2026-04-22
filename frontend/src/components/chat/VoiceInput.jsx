@@ -58,8 +58,14 @@ export default function VoiceInput({ onTranscript, disabled, transcriptionAvaila
         setState('transcribing')
         try {
           const text = await transcribeAudio(blob)
-          onTranscript(text)
-          setState('idle')
+          if (!text || text.trim() === '') {
+            setErrorMessage('Transcription service unavailable. Please type your question instead.')
+            setState('error')
+            setTimeout(() => setState('idle'), 4000)
+          } else {
+            onTranscript(text)
+            setState('idle')
+          }
         } catch {
           setErrorMessage('Transcription failed. Please try again or type your question.')
           setState('error')
