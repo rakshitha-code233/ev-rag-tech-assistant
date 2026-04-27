@@ -1,9 +1,19 @@
 import sqlite3
 from pathlib import Path
 import bcrypt
+import os
 
-# Always resolve to the directory where db.py lives, regardless of cwd
-DB_NAME = str(Path(__file__).resolve().parent / "users.db")
+# Use persistent directory on Render, local directory otherwise
+if os.getenv('RENDER'):
+    # On Render, use /var/data for persistent storage
+    DB_DIR = Path('/var/data')
+    DB_DIR.mkdir(parents=True, exist_ok=True)
+else:
+    # Locally, use backend directory
+    DB_DIR = Path(__file__).resolve().parent
+
+DB_NAME = str(DB_DIR / "users.db")
+
 def create_table():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -19,6 +29,7 @@ def create_table():
 
     conn.commit()
     conn.close()
+
 # ---------------- INIT TABLE ----------------
 def init_db():
     conn = sqlite3.connect(DB_NAME)

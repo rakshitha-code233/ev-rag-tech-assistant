@@ -6,9 +6,10 @@ __pycache__/
 Kiro/
 .env
 vectorstore/
-# Ignore database files
+# Ignore database files (except users.db which needs to persist)
 *.sqlite3
 *.db
+!backend/users.db
 
 # Ignore vector DB
 backend/database/

@@ -11,3 +11,8 @@ services:
         generateValue: true
       - key: PYTHON_VERSION
         value: 3.11.0
+    # Persistent disk for database
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
