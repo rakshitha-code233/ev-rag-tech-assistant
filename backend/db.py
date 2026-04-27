@@ -5,9 +5,15 @@ import os
 
 # Use persistent directory on Render, local directory otherwise
 if os.getenv('RENDER'):
-    # On Render, use /var/data for persistent storage
-    DB_DIR = Path('/var/data')
-    DB_DIR.mkdir(parents=True, exist_ok=True)
+    # On Render, try to use /var/data for persistent storage
+    # If it doesn't exist or permission denied, fall back to /tmp
+    try:
+        DB_DIR = Path('/var/data')
+        DB_DIR.mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError):
+        # Fallback to /tmp if /var/data not available
+        DB_DIR = Path('/tmp')
+        DB_DIR.mkdir(parents=True, exist_ok=True)
 else:
     # Locally, use backend directory
     DB_DIR = Path(__file__).resolve().parent
