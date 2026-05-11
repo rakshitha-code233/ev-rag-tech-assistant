@@ -78,7 +78,7 @@ def init_chat_history_table():
             user_id    INTEGER NOT NULL REFERENCES users(id),
             title      TEXT NOT NULL,
             messages   TEXT NOT NULL,
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            created_at TEXT NOT NULL DEFAULT (datetime('now', 'utc') || 'Z')
         )
         """
     )
@@ -477,10 +477,13 @@ def save_history():
     if not title:
         return jsonify({"error": "title is required"}), 400
 
+    # Use ISO format with UTC timezone
+    created_at = datetime.now(tz=timezone.utc).isoformat()
+
     conn = get_db()
     cursor = conn.execute(
-        "INSERT INTO chat_history (user_id, title, messages) VALUES (?, ?, ?)",
-        (user_id, title[:80], json.dumps(messages)),
+        "INSERT INTO chat_history (user_id, title, messages, created_at) VALUES (?, ?, ?, ?)",
+        (user_id, title[:80], json.dumps(messages), created_at),
     )
     conn.commit()
     new_id = cursor.lastrowid

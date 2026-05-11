@@ -272,26 +272,26 @@ def retrieve_manual_chunks(query: str, top_k: Optional[int] = None) -> List[Retr
     if top_k is None:
         top_k = config.top_k
     
-    # Load metadata to get chunks
-    index_manager = get_index_manager()
-    index_data = index_manager.load_index()
-    
-    if index_data is None:
-        logger.warning("No manual index available")
+    # Load metadata directly from file
+    if not METADATA_FILE.exists():
+        logger.warning(f"No manual index available at {METADATA_FILE}")
         return []
     
-    # Get metadata
-    metadata_dict = index_data["metadata"]
+    try:
+        with open(METADATA_FILE, "r") as f:
+            metadata_dict = json.load(f)
+    except Exception as e:
+        logger.error(f"Failed to load metadata: {e}")
+        return []
     
-    # Handle both old format (list) and new format (dict with "chunks" key)
-    if isinstance(metadata_dict, dict):
-        metadata = metadata_dict.get("chunks", [])
-    else:
-        metadata = metadata_dict
+    # Get chunks from metadata
+    metadata = metadata_dict.get("chunks", [])
     
     if not metadata:
         logger.warning("No chunks in metadata")
         return []
+    
+    logger.info(f"Loaded {len(metadata)} chunks from index")
     
     # Use BM25 for retrieval
     embedder = get_embedder()
@@ -301,6 +301,7 @@ def retrieve_manual_chunks(query: str, top_k: Optional[int] = None) -> List[Retr
         texts = [item["text"] for item in metadata]
         try:
             embedder.encode(texts)  # This builds the BM25 index
+            logger.info(f"Built BM25 index with {len(texts)} texts")
         except Exception as e:
             logger.error(f"Failed to build BM25 index: {e}")
             return []
@@ -308,6 +309,7 @@ def retrieve_manual_chunks(query: str, top_k: Optional[int] = None) -> List[Retr
     # Search using BM25
     try:
         results = embedder.search(query, top_k=top_k)
+        logger.info(f"BM25 search returned {len(results)} results")
     except Exception as e:
         logger.error(f"BM25 search failed: {e}")
         return []
@@ -332,7 +334,7 @@ def retrieve_manual_chunks(query: str, top_k: Optional[int] = None) -> List[Retr
         )
         retrieved.append(chunk)
     
-    logger.debug(f"Retrieved {len(retrieved)} chunks for query: {query[:50]}...")
+    logger.info(f"Retrieved {len(retrieved)} chunks for query: {query[:50]}...")
     return retrieved
 
 
