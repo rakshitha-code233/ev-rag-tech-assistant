@@ -26,7 +26,7 @@ GitHub's push protection detected that the Groq API key was included in the docu
 
 Replaced:
 ```bash
-GROQ_API_KEY=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
+GROQ_API_KEY=your_old_api_key_here
 ```
 
 With:
@@ -65,7 +65,7 @@ Since the API key was exposed in the git history, you **must** rotate it immedia
 ### Step 1: Delete Old API Key
 
 1. Go to: https://console.groq.com/keys
-2. Find the key: `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`
+2. Find and delete your old API key
 3. Click "Delete"
 
 ### Step 2: Generate New API Key

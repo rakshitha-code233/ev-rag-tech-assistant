@@ -35,7 +35,7 @@ Since the API key was exposed in git history, you **MUST** rotate it immediately
 ### Step 1: Delete Old API Key
 
 1. Go to: https://console.groq.com/keys
-2. Find the key: `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`
+2. Find and delete your old API key
 3. Click "Delete"
 
 ### Step 2: Generate New API Key
