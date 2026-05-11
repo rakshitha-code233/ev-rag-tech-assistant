@@ -157,7 +157,7 @@ def get_history():
 
 3. **Set environment variables**:
    ```bash
-   GROQ_API_KEY=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
+   GROQ_API_KEY=your_groq_api_key_here
    JWT_SECRET=ev_diag_secret_change_in_production
    FRONTEND_URL=https://your-frontend-url.com
    ```

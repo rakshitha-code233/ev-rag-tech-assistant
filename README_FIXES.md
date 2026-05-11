@@ -100,7 +100,7 @@ pip install -r backend/requirements.txt
 
 ### Step 2: Set Environment Variables
 ```bash
-export GROQ_API_KEY="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"
+export GROQ_API_KEY="your_groq_api_key_here"
 export JWT_SECRET="ev_diag_secret_change_in_production"
 ```
 

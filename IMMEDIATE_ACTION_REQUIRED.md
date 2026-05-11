@@ -26,7 +26,7 @@ Make sure these are set in your deployment environment:
 
 ```bash
 # Required
-GROQ_API_KEY=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
+GROQ_API_KEY=your_groq_api_key_here
 
 # Optional but recommended
 JWT_SECRET=ev_diag_secret_change_in_production
