@@ -181,10 +181,20 @@ def build_extract_answer(query: str) -> str:
 
 
 def get_answer(query: str) -> str:
+    """Get answer from RAG system using Groq LLM.
+    
+    Args:
+        query: User query string
+        
+    Returns:
+        Answer string with citations
+    """
+    # Handle greetings first
     greeting = handle_greetings(query)
     if greeting:
         return greeting
 
+    # Select relevant chunks from manuals
     chunks = select_relevant_chunks(query)
     if not chunks:
         return (
@@ -192,21 +202,29 @@ def get_answer(query: str) -> str:
             "Try naming the vehicle, system, symptom, or DTC, or upload the relevant manual first."
         )
 
+    # Format context and citations
     context = format_context(chunks)
     citations = format_citations(chunks)
+    
+    # Get Groq client
     client = get_groq_client()
 
     if client is None:
+        # Fallback if Groq API key not configured
         return build_extract_answer(query)
 
     try:
+        # Call Groq LLM with manual context
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=build_manual_only_prompt(query, context),
             temperature=0.2,
+            max_tokens=1024,
         )
         answer = response.choices[0].message.content.strip()
-    except Exception:
+    except Exception as e:
+        # Fallback to extract answer if LLM fails
+        print(f"Groq API error: {e}")
         return build_extract_answer(query)
 
     # Extract inline citations from answer and build proper citations section
