@@ -276,7 +276,14 @@ def _manual_meta(path: Path) -> dict:
 @app.route("/api/manuals", methods=["GET"])
 @require_auth
 def list_manuals():
-    manuals = [_manual_meta(p) for p in list_manual_files()]
+    user_id = request.current_user["sub"]
+    user_dir = DATA_DIR / f"user_{user_id}"
+    
+    # Return empty list if user directory doesn't exist
+    if not user_dir.exists():
+        return jsonify([])
+    
+    manuals = [_manual_meta(p) for p in sorted(user_dir.glob("*.pdf"))]
     return jsonify(manuals)
 
 
@@ -302,8 +309,12 @@ def upload_manual():
             "Please upload manuals related to electric vehicles (e.g., Tesla_Model3.pdf, EV_Diagnostic_Manual.pdf)"
         }), 400
 
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    dest = DATA_DIR / uploaded.filename
+    # Get user_id and create user-specific directory
+    user_id = request.current_user["sub"]
+    user_dir = DATA_DIR / f"user_{user_id}"
+    user_dir.mkdir(parents=True, exist_ok=True)
+    
+    dest = user_dir / uploaded.filename
 
     if dest.exists():
         return jsonify({"error": "A manual with this name already exists"}), 409
@@ -311,7 +322,7 @@ def upload_manual():
     uploaded.save(str(dest))
 
     try:
-        build_manual_index()
+        build_manual_index(user_id)
     except Exception:
         pass  # Index rebuild is best-effort; file is saved regardless
 
@@ -321,14 +332,17 @@ def upload_manual():
 @app.route("/api/manuals/<path:filename>", methods=["DELETE"])
 @require_auth
 def delete_manual(filename: str):
-    target = DATA_DIR / filename
+    user_id = request.current_user["sub"]
+    user_dir = DATA_DIR / f"user_{user_id}"
+    target = user_dir / filename
+    
     if not target.exists():
         return jsonify({"error": "Manual not found"}), 404
 
     target.unlink()
 
     try:
-        build_manual_index()
+        build_manual_index(user_id)
     except Exception:
         pass
 

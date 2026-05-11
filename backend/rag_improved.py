@@ -144,10 +144,27 @@ def get_citation_tracker() -> CitationTracker:
     return _citation_tracker
 
 
-def list_manual_files() -> List[Path]:
-    """List all PDF manual files."""
+def list_manual_files(user_id: Optional[int] = None) -> List[Path]:
+    """List all PDF manual files.
+    
+    Args:
+        user_id: Optional user ID to list only that user's manuals.
+                If None, lists all manuals (for backward compatibility).
+    """
     ensure_directories()
-    return sorted(DATA_DIR.glob("*.pdf"))
+    
+    if user_id is not None:
+        user_dir = DATA_DIR / f"user_{user_id}"
+        if not user_dir.exists():
+            return []
+        return sorted(user_dir.glob("*.pdf"))
+    
+    # Backward compatibility: list all manuals from all user directories
+    all_manuals = []
+    for user_dir in DATA_DIR.glob("user_*"):
+        if user_dir.is_dir():
+            all_manuals.extend(sorted(user_dir.glob("*.pdf")))
+    return sorted(all_manuals)
 
 
 def extract_chunks_from_pdf(pdf_path: Path) -> List[Dict[str, object]]:
@@ -177,17 +194,21 @@ def extract_chunks_from_pdf(pdf_path: Path) -> List[Dict[str, object]]:
     return chunks
 
 
-def build_manual_index() -> Dict[str, object]:
+def build_manual_index(user_id: Optional[int] = None) -> Dict[str, object]:
     """Build manual index with BM25 retrieval.
+    
+    Args:
+        user_id: Optional user ID to build index only for that user's manuals.
+                If None, builds index for all manuals (for backward compatibility).
     
     Returns:
         Dictionary with keys: manuals_indexed, chunks_indexed
     """
     ensure_directories()
     
-    logger.info("Building manual index...")
+    logger.info(f"Building manual index for user_id={user_id}...")
     
-    manual_files = list_manual_files()
+    manual_files = list_manual_files(user_id)
     all_chunks: List[Dict[str, object]] = []
     
     # Extract chunks from all PDFs
