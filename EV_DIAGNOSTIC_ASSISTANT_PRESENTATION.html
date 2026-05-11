@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Diagnostic Assistant - Project Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f0f0;
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        .slide h1 {
+            font-size: 4em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slide h2 {
+            font-size: 3em;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slide h3 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .slide p, .slide li {
+            font-size: 1.5em;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .slide ul {
+            list-style: none;
+            text-align: left;
+            display: inline-block;
+        }
+
+        .slide li {
+            margin: 15px 0;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .slide li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        /* Slide Specific Styles */
+        .title-slide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .title-slide .subtitle {
+            font-size: 2em;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .title-slide .date {
+            font-size: 1.3em;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+
+        .content-slide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            text-align: left;
+            padding: 80px 100px;
+            justify-content: flex-start;
+        }
+
+        .content-slide h2 {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .content-slide .content {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+        }
+
+        .column {
+            text-align: left;
+        }
+
+        .column h3 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .tech-item {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tech-item h4 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .tech-item p {
+            font-size: 1.1em;
+            margin: 0;
+        }
+
+        .feature-box {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 15px 0;
+            backdrop-filter: blur(10px);
+            border-left: 5px solid #ffd700;
+        }
+
+        .feature-box h4 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        .feature-box p {
+            font-size: 1.1em;
+            margin: 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.15);
+            padding: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-box .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .stat-box .label {
+            font-size: 1.2em;
+        }
+
+        .demo-section {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .demo-section h4 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .demo-section p {
+            font-size: 1.2em;
+            text-align: left;
+        }
+
+        .skill-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 12px 20px;
+            border-radius: 20px;
+            margin: 8px;
+            font-size: 1.1em;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            font-size: 1.2em;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        .logo {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .architecture-box {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .architecture-box h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        @media print {
+            .controls, .slide-counter {
+                display: none;
+            }
+            .slide {
+                page-break-after: always;
+                display: flex !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Title Slide -->
+        <div class="slide active title-slide">
+            <div class="logo">🚗</div>
+            <h1>EV Diagnostic Assistant</h1>
+            <p class="subtitle">AI-Powered Repair Manual Search System</p>
+            <p style="font-size: 1.3em; margin-top: 40px;">An Intelligent Solution for EV Technicians</p>
+            <p class="date">Internship Project | April 2026</p>
+        </div>
+
+        <!-- Slide 2: Introduction -->
+        <div class="slide content-slide">
+            <h2>Introduction</h2>
+            <div class="content">
+                <div class="feature-box">
+                    <h4>Problem Statement</h4>
+                    <p>EV technicians waste valuable time manually searching through repair manuals to find diagnostic answers, leading to delays, errors, and inefficiency in vehicle troubleshooting.</p>
+                </div>
+                <div class="feature-box" style="margin-top: 30px;">
+                    <h4>Our Solution</h4>
+                    <p>We built an AI-powered web application that instantly answers diagnostic questions based on uploaded EV repair manuals using Retrieval-Augmented Generation (RAG) technology.</p>
+                </div>
+                <div class="feature-box" style="margin-top: 30px;">
+                    <h4>Key Benefit</h4>
+                    <p>Technicians can now ask natural language questions and receive accurate, manual-based answers with citations in seconds instead of minutes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Organization / Platform Details -->
+        <div class="slide content-slide">
+            <h2>Organization & Platform Details</h2>
+            <div class="content">
+                <div class="two-column">
+                    <div class="column">
+                        <h3>🏗️ Architecture</h3>
+                        <div class="architecture-box">
+                            <h4>Frontend</h4>
+                            <p>React SPA with Vite, Tailwind CSS</p>
+                        </div>
+                        <div class="architecture-box">
+                            <h4>Backend</h4>
+                            <p>Flask REST API with Python</p>
+                        </div>
+                        <div class="architecture-box">
+                            <h4>Database</h4>
+                            <p>SQLite with persistent storage</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <h3>☁️ Deployment</h3>
+                        <div class="architecture-box">
+                            <h4>Backend</h4>
+                            <p>Render (Free Tier)</p>
+                        </div>
+                        <div class="architecture-box">
+                            <h4>Frontend</h4>
+                            <p>Vercel (Optimized SPA)</p>
+                        </div>
+                        <div class="architecture-box">
+                            <h4>Version Control</h4>
+                            <p>GitHub with Secret Scanning</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Work Done During Phase-1 -->
+        <div class="slide content-slide">
+            <h2>Work Done During Phase-1</h2>
+            <div class="content">
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="number">32</div>
+                        <div class="label">Hours Worked</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number">6</div>
+                        <div class="label">Major Fixes</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number">7</div>
+                        <div class="label">Features Built</div>
+                    </div>
+                </div>
+                <div style="margin-top: 40px;">
+                    <div class="feature-box">
+                        <h4>Backend Optimization</h4>
+                        <p>We reduced the backend memory footprint from 500MB to 100KB by replacing heavy machine learning models with the lightweight BM25 algorithm, enabling deployment on free tier infrastructure.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h4>Audio Transcription</h4>
+                        <p>We implemented hands-free voice input by integrating the Groq API for real-time audio transcription, allowing technicians to dictate diagnostic questions while working on vehicles.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h4>Data Persistence & Documentation</h4>
+                        <p>We fixed user account persistence issues by configuring persistent storage on Render and created 80+ pages of comprehensive technical documentation for the project.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Tools and Technologies Used -->
+        <div class="slide content-slide">
+            <h2>Tools & Technologies Used</h2>
+            <div class="content">
+                <div class="feature-box">
+                    <h4>Frontend Stack</h4>
+                    <p>We built the user interface using React with Vite for fast development, Tailwind CSS for responsive styling, and the Web Audio API for browser-based audio recording.</p>
+                </div>
+                <div class="feature-box">
+                    <h4>Backend Stack</h4>
+                    <p>The backend is powered by Flask REST API with Python, SQLite for persistent data storage, and PyPDF2 for reliable PDF processing without system dependencies.</p>
+                </div>
+                <div class="feature-box">
+                    <h4>AI & Search Technology</h4>
+                    <p>We implemented the BM25 algorithm for lightweight keyword-based search, RAG pipeline for context-aware responses, and cross-encoder re-ranking for improved result quality.</p>
+                </div>
+                <div class="feature-box">
+                    <h4>Deployment & Integration</h4>
+                    <p>The system is deployed on Render for the backend and Vercel for the frontend, with Groq API integration for audio transcription and GitHub for version control with secret scanning.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Sample Demonstration / Screenshots -->
+        <div class="slide content-slide">
+            <h2>Sample Demonstration</h2>
+            <div class="content">
+                <div class="demo-section">
+                    <h4>💬 Chat Interface</h4>
+                    <p>Technicians ask diagnostic questions in natural language and receive instant answers directly from uploaded manuals with source citations for verification.</p>
+                </div>
+                <div class="demo-section">
+                    <h4>📤 Manual Upload & Processing</h4>
+                    <p>Users upload PDF repair manuals which are automatically parsed, chunked, and indexed using BM25 for fast and accurate retrieval during searches.</p>
+                </div>
+                <div class="demo-section">
+                    <h4>🎤 Voice Input Feature</h4>
+                    <p>Technicians can use hands-free voice input by recording audio directly in the browser, which is transcribed using Groq API and automatically inserted into the chat.</p>
+                </div>
+                <div class="demo-section">
+                    <h4>📋 Chat History Management</h4>
+                    <p>All conversations are automatically saved with optimistic persistence, allowing technicians to review past diagnostics and rename conversations for better organization.</p>
+                </div>
+                <div class="demo-section">
+                    <h4>🌙 User Preferences</h4>
+                    <p>The application includes a dark mode toggle and persistent user settings, providing a comfortable interface for technicians working in various lighting conditions.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Skills Gained / Outcome of Phase-1 -->
+        <div class="slide content-slide">
+            <h2>Skills Gained & Outcomes</h2>
+            <div class="content">
+                <div class="feature-box">
+                    <h4>Technical Skills Developed</h4>
+                    <p>Through this project, I developed expertise in full-stack development, RAG systems, API integration, database design, DevOps practices, security best practices, Web Audio API, and Git workflows.</p>
+                </div>
+                <div class="feature-box">
+                    <h4>Production Deployment Experience</h4>
+                    <p>I learned critical lessons about production constraints, resource optimization, fallback strategies, error handling, and the importance of planning database persistence from the beginning.</p>
+                </div>
+                <div class="feature-box">
+                    <h4>Problem-Solving & Debugging</h4>
+                    <p>I successfully diagnosed and resolved complex issues including memory optimization, CORS configuration, user data persistence, and deployment permission errors through systematic troubleshooting.</p>
+                </div>
+                <div class="feature-box">
+                    <h4>Documentation & Communication</h4>
+                    <p>I created professional technical documentation spanning 80+ pages, demonstrating the ability to communicate complex technical concepts clearly for both technical and non-technical audiences.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Future Work -->
+        <div class="slide content-slide">
+            <h2>Future Work & Improvements</h2>
+            <div class="content">
+                <div class="feature-box">
+                    <h4>🚀 Scalability Enhancement</h4>
+                    <p>We plan to migrate from SQLite to PostgreSQL for better multi-user support and implement a Redis caching layer to improve response times for frequently asked questions.</p>
+                </div>
+                <div class="feature-box">
+                    <h4>🤖 Advanced AI Capabilities</h4>
+                    <p>We will implement semantic embeddings for improved accuracy, add fine-tuned models for specific EV brands, and integrate multiple LLM providers for better response quality.</p>
+                </div>
+                <div class="feature-box">
+                    <h4>🔒 Security & Access Control</h4>
+                    <p>We will implement role-based access control (RBAC) for different user types, add comprehensive audit logging, and encrypt sensitive data at rest and in transit.</p>
+                </div>
+                <div class="feature-box">
+                    <h4>📊 Monitoring & Analytics</h4>
+                    <p>We will set up production logging, real-time monitoring dashboards, and analytics to track system performance, user behavior, and identify optimization opportunities.</p>
+                </div>
+                <div class="feature-box">
+                    <h4>🌍 Internationalization</h4>
+                    <p>We will add support for multiple languages, localization for different regions, and enable technicians from around the world to use the system in their native language.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Conclusion -->
+        <div class="slide title-slide">
+            <h1>Conclusion</h1>
+            <div style="font-size: 1.4em; line-height: 2; margin-top: 40px;">
+                <p style="margin-bottom: 30px;">✅ <span class="highlight">Production-Ready System</span> deployed and running successfully</p>
+                <p style="margin-bottom: 30px;">✅ <span class="highlight">7 Major Features</span> implemented with comprehensive functionality</p>
+                <p style="margin-bottom: 30px;">✅ <span class="highlight">32 Hours</span> of focused development and optimization</p>
+                <p style="margin-bottom: 30px;">✅ <span class="highlight">Professional Skills</span> gained in full-stack development</p>
+                <p style="margin-bottom: 40px;">✅ <span class="highlight">Real-World Impact</span> - System helps EV technicians work more efficiently</p>
+                <p style="font-size: 1.3em; margin-top: 50px; opacity: 0.9;">
+                    "From problem identification to production deployment - a complete learning journey"
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">9</span>
+    </div>
+
+    <div class="controls">
+        <button onclick="previousSlide()">← Previous</button>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function previousSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>

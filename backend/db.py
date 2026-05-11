@@ -64,7 +64,8 @@ def register_user(username, email, password):
         conn.close()
         return "exists"
 
-    hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    # Decode password hash to UTF-8 string before storage
+    hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode('utf-8')
 
     cursor.execute(
         "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
@@ -92,7 +93,8 @@ def login_user(email, password):
     if user:
         user_id, username, email_db, hashed_pw = user
 
-        if bcrypt.checkpw(password.encode(), hashed_pw):
+        # Encode password hash back to bytes before verification
+        if bcrypt.checkpw(password.encode(), hashed_pw.encode('utf-8')):
             return {
                 "id": user_id,
                 "username": username,

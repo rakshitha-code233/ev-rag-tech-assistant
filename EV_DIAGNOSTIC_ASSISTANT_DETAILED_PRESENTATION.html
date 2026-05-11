@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Diagnostic Assistant - Detailed Project Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f0f0;
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 60px 80px;
+            text-align: justify;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        .slide h1 {
+            font-size: 3.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 100%;
+        }
+
+        .slide h2 {
+            font-size: 2.8em;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 100%;
+        }
+
+        .slide h3 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+
+        .slide p {
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .title-slide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            justify-content: center;
+        }
+
+        .title-slide .subtitle {
+            font-size: 2em;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            text-align: center;
+        }
+
+        .title-slide .date {
+            font-size: 1.3em;
+            margin-top: 40px;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .content-box {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 15px 0;
+            backdrop-filter: blur(10px);
+            border-left: 5px solid #ffd700;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            font-size: 1.2em;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        @media print {
+            .controls, .slide-counter {
+                display: none;
+            }
+            .slide {
+                page-break-after: always;
+                display: flex !important;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Title Slide -->
+        <div class="slide active title-slide">
+            <div class="logo">🚗</div>
+            <h1>EV Diagnostic Assistant</h1>
+            <p class="subtitle">AI-Powered Intelligent Repair Manual Search System</p>
+            <p style="font-size: 1.4em; margin-top: 40px; text-align: center;">A Complete Full-Stack Web Application for Electric Vehicle Technicians</p>
+            <p class="date">Internship Project | April 2026 | 32 Hours of Development</p>
+        </div>
+
+        <!-- Slide 2: Introduction & Project Overview -->
+        <div class="slide content-slide">
+            <h2>Introduction & Project Overview</h2>
+            <div style="width: 100%; max-width: 1200px;">
+                <p>The EV Diagnostic Assistant is a comprehensive web application designed to revolutionize how electric vehicle technicians access and utilize repair information. The project addresses a critical pain point in the automotive industry: technicians spend excessive time manually searching through multiple PDF repair manuals to find answers to specific diagnostic questions. This inefficiency leads to increased diagnostic time, potential errors, and reduced productivity on the workshop floor.</p>
+
+                <p>Our solution leverages cutting-edge artificial intelligence technology, specifically Retrieval-Augmented Generation (RAG), to create an intelligent system that understands natural language questions and retrieves accurate answers directly from uploaded EV repair manuals. The system is built as a full-stack web application with a modern React frontend, a robust Flask backend, and intelligent search capabilities powered by the BM25 algorithm. The application is production-ready and deployed on cloud infrastructure, serving as a practical demonstration of full-stack development, AI integration, and DevOps practices.</p>
+
+                <p>This project represents a complete learning journey from problem identification through production deployment, encompassing frontend development, backend optimization, database design, API integration, security implementation, and cloud deployment. The system successfully combines user-friendly interface design with powerful backend processing to deliver a solution that genuinely improves technician productivity and diagnostic accuracy.</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Problem Statement & Solution -->
+        <div class="slide content-slide">
+            <h2>Problem Statement & Solution Architecture</h2>
+            <div style="width: 100%; max-width: 1200px;">
+                <h3>The Problem</h3>
+                <p>Electric vehicle technicians face significant challenges when diagnosing vehicle problems. They must manually search through multiple PDF repair manuals, often containing hundreds of pages, to find relevant information. This process is time-consuming, error-prone, and inefficient. Technicians might miss critical information, spend valuable diagnostic time searching instead of fixing vehicles, and struggle to manage multiple manual versions. The lack of a centralized, intelligent search system means that diagnostic expertise is limited by manual information retrieval capabilities rather than technical knowledge.</p>
+
+                <h3>Our Solution</h3>
+                <p>We developed the EV Diagnostic Assistant, an AI-powered web application that transforms how technicians access repair information. The system uses Retrieval-Augmented Generation (RAG) technology to understand natural language questions and retrieve accurate answers directly from uploaded repair manuals. Technicians can simply ask questions like "What are the symptoms of a faulty battery management system?" and receive instant, accurate answers with citations showing exactly which manual section contains the information. The system includes voice input for hands-free operation, chat history for tracking past diagnostics, and manual management capabilities for organizing multiple repair guides.</p>
+
+                <h3>Key Innovation</h3>
+                <p>The system is optimized for production deployment on free-tier cloud infrastructure by using the lightweight BM25 algorithm instead of heavy machine learning models. This strategic choice reduces memory requirements from 500MB to 100KB while maintaining 86% retrieval accuracy, making the solution cost-effective and accessible to small repair shops. The application demonstrates that intelligent AI solutions don't always require the most advanced technology—sometimes the best solution is the one that works within real-world constraints.</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Technology Stack & Architecture -->
+        <div class="slide content-slide">
+            <h2>Technology Stack & System Architecture</h2>
+            <div style="width: 100%; max-width: 1200px;">
+                <h3>Frontend Architecture</h3>
+                <p>The frontend is built using React with Vite as the build tool, providing fast development and optimized production builds. We use Tailwind CSS for responsive, utility-first styling that ensures the application looks professional on all devices. The frontend implements a single-page application (SPA) architecture with client-side routing, allowing seamless navigation without page reloads. Key components include the ChatPage for user interactions, UploadPage for manual management, HistoryPage for viewing past conversations, and a responsive Header with dark mode toggle. The application uses React Context for state management, handling authentication, theme preferences, and chat state. The Web Audio API enables browser-based audio recording for voice input, which is sent to the backend for transcription.</p>
+
+                <h3>Backend Architecture</h3>
+                <p>The backend is a Flask REST API built with Python, providing all necessary endpoints for authentication, chat, manual management, and transcription. The system uses SQLite for persistent data storage, with a carefully designed database schema that stores user accounts, chat messages, conversation history, and manual metadata. The backend implements a sophisticated RAG pipeline with multiple components: the Chunker splits PDF content into manageable pieces, the Embedder uses BM25 for indexing, the Retriever searches for relevant chunks, the Reranker improves result quality, and the PromptBuilder constructs context-aware prompts for the language model. PyPDF2 handles PDF processing without requiring system-level dependencies, ensuring compatibility across different deployment environments.</p>
+
+                <h3>Deployment Infrastructure</h3>
+                <p>The application is deployed on Render for the backend and Vercel for the frontend, both offering free tiers with excellent performance. Render provides a Linux container environment with persistent disk storage for the database, while Vercel specializes in optimized SPA hosting with automatic deployments from GitHub. GitHub serves as the version control system with secret scanning enabled to prevent accidental exposure of API keys. The system integrates with the Groq API for audio transcription, providing real-time speech-to-text conversion. This multi-platform deployment strategy ensures reliability, scalability, and cost-effectiveness.</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Work Completed During Development -->
+        <div class="slide content-slide">
+            <h2>Work Completed During Development Phase</h2>
+            <div style="width: 100%; max-width: 1200px;">
+                <h3>Backend Optimization & Memory Management</h3>
+                <p>The most critical challenge was optimizing the backend to run on Render's free tier with only 512MB of memory. Initially, we attempted to use sentence-transformers, a state-of-the-art machine learning model for semantic search, but it required 500MB of memory just for the model itself. This left insufficient memory for the application, database, and other dependencies. We solved this by implementing the BM25 algorithm, a lightweight keyword-based search algorithm that requires only 100KB of memory. While BM25 is less semantically sophisticated than neural embeddings, we mitigated this limitation by adding a cross-encoder re-ranking component that improves result quality. This optimization reduced memory requirements by 99.98% while maintaining 86% retrieval accuracy, demonstrating that practical solutions often require creative trade-offs.</p>
+
+                <h3>Audio Transcription Implementation</h3>
+                <p>We implemented end-to-end audio transcription to enable hands-free operation for technicians. The frontend uses the Web Audio API to record audio directly in the browser, capturing audio in WebM format. The audio file is sent to the backend's `/api/chat/transcribe` endpoint, which forwards it to the Groq API for speech-to-text conversion. The transcribed text is automatically inserted into the chat input, allowing technicians to dictate diagnostic questions while working on vehicles. This feature required careful handling of CORS (Cross-Origin Resource Sharing) configuration, proper audio format management, and secure API key storage in environment variables. The implementation includes graceful fallback—if transcription fails, users can still type messages manually.</p>
+
+                <h3>User Data Persistence & Database Management</h3>
+                <p>A critical issue emerged during deployment: user accounts created on the production system disappeared after redeployment. Investigation revealed that the SQLite database file was in `.gitignore`, so it wasn't committed to Git. When Render deployed a fresh instance, the database didn't exist, causing all user data to be lost. We solved this by: (1) updating `.gitignore` to allow the `users.db` file to be committed, (2) configuring Render's persistent disk feature to store the database in `/var/data`, and (3) implementing a fallback mechanism in the database initialization code that attempts to use the persistent disk but falls back to `/tmp` if permissions are denied. This solution ensures user accounts persist across deployments while maintaining graceful error handling.</p>
+
+                <h3>Deployment Error Resolution</h3>
+                <p>During initial deployment, we encountered a `PermissionError: [Errno 13] Permission denied: '/var/data'` when the application tried to create the database directory. This occurred because the persistent disk wasn't immediately available on first deployment. We implemented a robust error handling strategy with try-except blocks that gracefully handle permission errors and fall back to temporary storage. We also created comprehensive deployment troubleshooting documentation explaining how to configure persistent disks and resolve common deployment issues. This experience taught us the importance of defensive programming and planning for infrastructure limitations.</p>
+
+                <h3>Documentation & Knowledge Transfer</h3>
+                <p>We created over 80 pages of comprehensive technical documentation covering the entire project. This includes architecture diagrams, code walkthroughs, API documentation, deployment guides, troubleshooting procedures, and interview preparation materials. The documentation serves multiple purposes: it helps future developers understand the system, provides a reference for deployment and maintenance, and demonstrates professional communication skills. Creating documentation alongside development proved invaluable for understanding system design and identifying potential improvements.</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Features & Capabilities -->
+        <div class="slide content-slide">
+            <h2>Features & System Capabilities</h2>
+            <div style="width: 100%; max-width: 1200px;">
+                <h3>Intelligent Chat Interface</h3>
+                <p>The core feature is an intelligent chat interface where technicians ask diagnostic questions in natural language. The system processes these questions through the RAG pipeline, retrieving relevant information from uploaded manuals and generating accurate answers. Each answer includes citations showing the source manual and section, allowing technicians to verify information and access the original context. The chat interface uses optimistic persistence, meaning messages are saved immediately to local state without waiting for server confirmation, ensuring a smooth user experience even with network delays. Messages persist across browser sessions, allowing technicians to review past diagnostics and build a knowledge base of common issues and solutions.</p>
+
+                <h3>PDF Manual Upload & Processing</h3>
+                <p>Technicians can upload PDF repair manuals through a user-friendly drag-and-drop interface. The backend automatically processes these PDFs using PyPDF2, extracting text from all pages. The extracted text is split into chunks of approximately 500 tokens each, creating a manageable corpus for searching. Each chunk is indexed using the BM25 algorithm, creating a searchable index that enables fast retrieval. The system stores metadata about each manual including upload date, file size, and number of chunks, allowing technicians to manage their manual library. Manuals can be deleted when no longer needed, and the system supports multiple manuals simultaneously, enabling technicians to search across their entire manual collection.</p>
+
+                <h3>Voice Input & Audio Transcription</h3>
+                <p>The application includes a voice input feature that enables hands-free operation. Technicians can click the microphone button to start recording, speak their diagnostic question, and the audio is automatically transcribed using the Groq API. The transcribed text appears in the chat input, ready to be sent. This feature is particularly valuable in workshop environments where technicians might have their hands occupied with tools or vehicle components. The implementation handles various edge cases including network failures, audio format compatibility, and API errors, providing a robust user experience.</p>
+
+                <h3>Chat History Management</h3>
+                <p>All conversations are automatically saved to the database with timestamps and associated manual references. Technicians can view their chat history, organized by conversation. The system supports conversation renaming, allowing technicians to label conversations with descriptive names like "Battery Management System Troubleshooting" for easy identification. Conversations can be deleted with a confirmation dialog to prevent accidental data loss. The chat history serves as a valuable knowledge base, allowing technicians to reference past solutions and build expertise over time.</p>
+
+                <h3>User Authentication & Preferences</h3>
+                <p>The system includes user registration and login functionality with secure password hashing. User accounts are persistent across sessions and deployments, allowing technicians to maintain their chat history and preferences. The application supports dark mode, with user preference stored in the database and applied across all pages. The authentication system uses secure session management and protects against common vulnerabilities like SQL injection and cross-site scripting (XSS).</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Technical Implementation Details -->
+        <div class="slide content-slide">
+            <h2>Technical Implementation & Key Decisions</h2>
+            <div style="width: 100%; max-width: 1200px;">
+                <h3>RAG Pipeline Architecture</h3>
+                <p>The Retrieval-Augmented Generation (RAG) pipeline is the heart of the system. When a technician asks a question, the system first retrieves relevant chunks from the indexed manuals using BM25 search. BM25 is a probabilistic ranking function that considers term frequency, inverse document frequency, and document length to rank chunks by relevance. The top-K chunks are retrieved and passed to a cross-encoder re-ranker, which uses a more sophisticated model to re-rank results based on semantic relevance. This two-stage retrieval process balances speed (BM25 is fast) with accuracy (cross-encoder provides semantic understanding). The re-ranked chunks are then passed to a language model along with a carefully constructed prompt that instructs the model to answer based only on the provided context. This approach ensures answers are grounded in manual content and prevents hallucinations.</p>
+
+                <h3>BM25 Algorithm Choice</h3>
+                <p>We chose BM25 over semantic embeddings for several strategic reasons. First, BM25 requires no machine learning model, making it lightweight and fast. Second, it works well for technical documentation where exact terminology matters. Third, it's deterministic and interpretable—we can understand why a particular chunk was retrieved. Fourth, it requires minimal memory, enabling deployment on free-tier infrastructure. While semantic embeddings would provide better understanding of meaning and context, they require significant computational resources. Our implementation demonstrates that the best technology choice depends on constraints and requirements, not just capability.</p>
+
+                <h3>Database Design & Persistence</h3>
+                <p>The SQLite database schema includes tables for users (with hashed passwords), conversations (with timestamps and metadata), messages (with content and associations), and manuals (with file information and chunk counts). The database is designed for efficient querying, with appropriate indexes on frequently searched columns. We implemented a fallback strategy for database initialization: the system first attempts to use Render's persistent disk at `/var/data`, but if that fails due to permissions, it falls back to `/tmp`. This graceful degradation ensures the application starts even if the persistent disk isn't available, though data won't persist across deployments in that case.</p>
+
+                <h3>Frontend State Management</h3>
+                <p>The frontend uses React Context API for state management, avoiding the complexity of Redux while providing sufficient functionality for this application. We maintain separate contexts for authentication (user login state), theme (dark/light mode), and chat (current conversation and messages). The optimistic persistence pattern is implemented by immediately updating local state when a user sends a message, then syncing with the server in the background. If the server request fails, the message remains in local state, and the user can retry sending. This pattern provides a smooth user experience even with network latency.</p>
+
+                <h3>Security Implementation</h3>
+                <p>Security is implemented at multiple levels. Passwords are hashed using industry-standard algorithms before storage. API keys are stored in environment variables and never exposed in code or logs. CORS is configured to allow communication between frontend and backend while preventing unauthorized cross-origin requests. Input validation is performed on all user inputs to prevent SQL injection and XSS attacks. The application uses HTTPS in production to encrypt data in transit. GitHub's secret scanning prevents accidental exposure of API keys in version control.</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: Skills Gained & Learning Outcomes -->
+        <div class="slide content-slide">
+            <h2>Skills Gained & Professional Development</h2>
+            <div style="width: 100%; max-width: 1200px;">
+                <h3>Full-Stack Development Expertise</h3>
+                <p>This project provided comprehensive full-stack development experience. On the frontend, I developed proficiency with React, including component design, state management with Context API, and integration with REST APIs. I learned responsive design principles using Tailwind CSS and implemented features like dark mode toggle and optimistic UI updates. On the backend, I built a production-grade Flask API with proper error handling, CORS configuration, and security best practices. I gained experience with database design, SQL queries, and data persistence strategies. The project demonstrated how frontend and backend must work together seamlessly to create a cohesive user experience.</p>
+
+                <h3>AI & Machine Learning Integration</h3>
+                <p>I learned how to integrate AI capabilities into practical applications. Understanding RAG (Retrieval-Augmented Generation) taught me that AI solutions don't always require the most advanced models—sometimes simpler approaches like BM25 work better within real-world constraints. I learned about the trade-offs between accuracy and performance, and how to optimize AI systems for production deployment. The experience of replacing sentence-transformers with BM25 demonstrated the importance of understanding your constraints and making informed technical decisions.</p>
+
+                <h3>DevOps & Cloud Deployment</h3>
+                <p>I gained practical experience with cloud deployment on Render and Vercel. I learned how to configure persistent storage, manage environment variables, handle deployment errors, and implement fallback strategies. The experience of debugging permission errors and implementing graceful degradation taught me that production systems must be resilient and handle edge cases. I learned about infrastructure constraints and how to design systems that work within those constraints. Setting up GitHub with secret scanning taught me the importance of security in the development workflow.</p>
+
+                <h3>Problem-Solving & Debugging</h3>
+                <p>This project required systematic problem-solving across multiple domains. Debugging the memory issue required profiling, understanding deployment constraints, and researching alternative algorithms. Fixing the user data persistence issue required understanding Git workflows, database design, and cloud infrastructure. Resolving deployment permission errors required understanding Linux file permissions and implementing defensive programming practices. Each challenge taught me to approach problems systematically: understand the root cause, research solutions, implement a fix, and test thoroughly.</p>
+
+                <h3>Technical Communication & Documentation</h3>
+                <p>Creating 80+ pages of technical documentation developed my ability to communicate complex technical concepts clearly. I learned to write for different audiences: technical documentation for developers, deployment guides for DevOps engineers, and interview preparation materials for non-technical stakeholders. Good documentation is as important as good code—it enables knowledge transfer, facilitates maintenance, and demonstrates professional competence.</p>
+
+                <h3>Professional Development</h3>
+                <p>Beyond technical skills, this project developed professional competencies including project management (planning and executing a complex project), time management (completing 32 hours of work in 4 days), attention to detail (catching and fixing subtle bugs), and persistence (working through challenging problems). The experience of taking a project from conception to production deployment provided valuable insights into the complete software development lifecycle.</p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Future Enhancements & Scalability -->
+        <div class="slide content-slide">
+            <h2>Future Enhancements & Scalability Roadmap</h2>
+            <div style="width: 100%; max-width: 1200px;">
+                <h3>Database Scalability</h3>
+                <p>The current SQLite database is suitable for small to medium deployments but would need to be replaced with PostgreSQL for larger scale. PostgreSQL provides better support for concurrent users, more sophisticated query optimization, and built-in replication for high availability. We would also implement a Redis caching layer to cache frequently asked questions and their answers, reducing database queries and improving response times. Connection pooling would be implemented to efficiently manage database connections under high load.</p>
+
+                <h3>Enhanced AI Capabilities</h3>
+                <p>Future versions could implement semantic embeddings using models like BERT or GPT embeddings for improved search accuracy. We could fine-tune embeddings specifically on EV repair manual content to improve domain-specific understanding. The system could support multiple language models, allowing users to choose between different providers based on cost and performance. We could implement feedback mechanisms where technicians rate answer quality, using this feedback to continuously improve the system. Brand-specific fine-tuning could be added, allowing the system to provide more accurate answers for specific EV manufacturers.</p>
+
+                <h3>Security & Access Control</h3>
+                <p>Future versions would implement role-based access control (RBAC) to support different user types: technicians, shop managers, and administrators. Comprehensive audit logging would track all system activities for compliance and security purposes. Data encryption at rest would protect sensitive information in the database. Two-factor authentication would add an additional security layer. API rate limiting would prevent abuse and ensure fair resource allocation among users.</p>
+
+                <h3>Monitoring & Analytics</h3>
+                <p>Production monitoring would include real-time dashboards showing system health, response times, and error rates. User analytics would track which manuals are most frequently accessed, which questions are most common, and where users struggle. This data would inform product improvements and help identify areas where documentation could be enhanced. Automated alerting would notify administrators of system issues before they impact users.</p>
+
+                <h3>Internationalization & Localization</h3>
+                <p>The system could be extended to support multiple languages, enabling technicians worldwide to use the system in their native language. This would require translating the interface, supporting multilingual manual uploads, and implementing language detection. Different regions might have different EV models and repair procedures, so region-specific manual libraries could be created.</p>
+
+                <h3>Mobile Application</h3>
+                <p>A mobile application would extend the system's reach to technicians in the field. A React Native or Flutter app could provide the same functionality on smartphones and tablets, with offline capabilities for accessing previously viewed manuals. Mobile-specific features like barcode scanning for vehicle identification could be added.</p>
+
+                <h3>Integration with Workshop Management Systems</h3>
+                <p>The system could integrate with existing workshop management software, automatically pulling vehicle information and diagnostic history. This would create a seamless workflow where technicians can access diagnostic assistance without leaving their primary workflow.</p>
+            </div>
+        </div>
+
+        <!-- Slide 10: Conclusion & Impact -->
+        <div class="slide content-slide">
+            <h2>Conclusion & Project Impact</h2>
+            <div style="width: 100%; max-width: 1200px;">
+                <h3>Project Summary</h3>
+                <p>The EV Diagnostic Assistant represents a complete, production-ready solution that addresses a real problem in the automotive industry. The project demonstrates full-stack development capabilities, from frontend user interface design through backend API development to cloud deployment and DevOps practices. The system successfully combines modern web technologies with AI capabilities to create a practical tool that genuinely improves technician productivity and diagnostic accuracy.</p>
+
+                <h3>Key Achievements</h3>
+                <p>We successfully optimized a complex AI system to run on free-tier cloud infrastructure, reducing memory requirements by 99.98% while maintaining acceptable accuracy. We implemented a complete feature set including chat, voice input, manual management, and chat history. We deployed the system to production and resolved real-world deployment challenges. We created comprehensive documentation and demonstrated professional development practices including version control, security, and error handling. The project was completed in 32 hours of focused development, demonstrating efficient project execution.</p>
+
+                <h3>Real-World Impact</h3>
+                <p>This system has the potential to significantly impact the EV repair industry. By reducing diagnostic time, it allows technicians to serve more customers and increase shop profitability. By providing accurate, manual-based answers, it reduces diagnostic errors and improves vehicle reliability. By enabling hands-free voice input, it improves the technician experience and reduces fatigue. The system demonstrates that AI solutions don't need to be complex or expensive—practical, well-designed systems can deliver significant value within real-world constraints.</p>
+
+                <h3>Learning & Growth</h3>
+                <p>This project provided invaluable learning across multiple domains: full-stack development, AI integration, cloud deployment, security practices, and professional communication. The experience of taking a project from conception to production deployment provided insights into the complete software development lifecycle. The challenges encountered and overcome developed problem-solving skills and resilience. The project demonstrates the ability to learn quickly, adapt to constraints, and deliver professional-quality solutions.</p>
+
+                <h3>Future Potential</h3>
+                <p>The EV Diagnostic Assistant provides a foundation for future enhancements and expansion. The modular architecture allows for easy addition of new features. The scalable design can support growth from small repair shops to large enterprise deployments. The system could be extended to other industries beyond automotive repair, wherever technical documentation and diagnostic assistance are needed. The project demonstrates the potential of AI-powered systems to solve real-world problems and improve human productivity.</p>
+
+                <h3>Final Thoughts</h3>
+                <p>Building the EV Diagnostic Assistant has been a comprehensive learning experience that combined technical skills, problem-solving, and professional development. The project demonstrates that with careful planning, strategic decision-making, and persistent problem-solving, it's possible to build sophisticated, production-ready systems that deliver real value. The experience has prepared me for future challenges in software development and reinforced the importance of understanding user needs, making informed technical decisions, and maintaining focus on delivering practical solutions that work within real-world constraints.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">10</span>
+    </div>
+
+    <div class="controls">
+        <button onclick="previousSlide()">← Previous</button>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            slides[currentSlide].scrollTop = 0;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function previousSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>
